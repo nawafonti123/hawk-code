@@ -94,7 +94,7 @@ const attachmentSchema = z.object({
   path: z.string(),
   mimeType: z.string(),
   size: z.number().nonnegative(),
-  kind: z.enum(["image", "text"]),
+  kind: z.enum(["image", "text", "pdf"]),
   textContent: z
     .string()
     .nullish()
@@ -237,7 +237,7 @@ export async function pickAttachments(): Promise<ChatAttachment[]> {
     title: "Attach files or images to HAWK Code",
     filters: [
       {
-        name: "Images, code, and text",
+        name: "Images, PDFs, code, and text",
         extensions: [
           "png",
           "jpg",
@@ -245,6 +245,7 @@ export async function pickAttachments(): Promise<ChatAttachment[]> {
           "webp",
           "gif",
           "bmp",
+          "pdf",
           "svg",
           "txt",
           "md",
