@@ -1,10 +1,10 @@
 use crate::agent::AgentPayload;
-use crate::browser_automation;
+use crate::{attachments, browser_automation};
 use crate::provider::{self, ChatMessage, ChatPayload, ChatResult, ProviderRuntime};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tauri::{AppHandle, Emitter};
 use tokio_util::sync::CancellationToken;
 
@@ -83,6 +83,10 @@ pub async fn try_run(
         None
     };
 
+    let generated_screenshot_name = screenshot_output
+        .as_deref()
+        .and_then(|output| emit_generated_screenshot(app, &root, output).ok().flatten());
+
     let AgentPayload {
         request_id,
         mut config,
@@ -101,13 +105,16 @@ pub async fn try_run(
     final_messages.push(ChatMessage {
         role: "user".to_owned(),
         content: Value::String(format!(
-            "The browser actions already ran successfully on the user's computer through Playwright. Do not say that browsing is unavailable.\n\nOriginal request:\n{user_text}\n\nOpened URL:\n{url}\n\nBrowser open result:\n{}\n\nCurrent page snapshot:\n{}\n\nScreenshot result:\n{}\n\nAnswer the user's request now using this browser evidence. Be concise but specific. If a screenshot path is present, mention that it was captured successfully.",
+            "The browser actions already ran successfully on the user's computer through Playwright. Do not say that browsing is unavailable.\n\nOriginal request:\n{user_text}\n\nOpened URL:\n{url}\n\nBrowser open result:\n{}\n\nCurrent page snapshot:\n{}\n\nScreenshot result:\n{}\n\nRegistered in-app screenshot preview:\n{}\n\nAnswer the user's request now using this browser evidence. Be concise but specific. If a registered screenshot filename is present, render that exact filename as inline code and tell the user they can click it inside HAWK Code to preview the image.",
             truncate(&open_output, 2_000),
             truncate(&snapshot_output, 30_000),
             screenshot_output
                 .as_deref()
                 .map(|value| truncate(value, 4_000))
-                .unwrap_or_else(|| "No screenshot was requested.".to_owned())
+                .unwrap_or_else(|| "No screenshot was requested.".to_owned()),
+            generated_screenshot_name
+                .as_deref()
+                .unwrap_or("No preview was registered.")
         )),
     });
 
@@ -129,7 +136,7 @@ pub async fn try_run(
 async fn run_browser_action(
     app: &AppHandle,
     request_id: &str,
-    root: &std::path::Path,
+    root: &Path,
     activity_id: &str,
     args: Value,
     cancellation: &CancellationToken,
@@ -163,6 +170,60 @@ async fn run_browser_action(
             Err(error)
         }
     }
+}
+
+fn emit_generated_screenshot(
+    app: &AppHandle,
+    root: &Path,
+    output: &str,
+) -> Result<Option<String>, String> {
+    let Some(path) = screenshot_path_from_output(root, output) else {
+        return Ok(None);
+    };
+    let mut prepared = attachments::prepare(attachments::AttachmentPayload {
+        paths: vec![path.to_string_lossy().into_owned()],
+    })?;
+    let Some(attachment) = prepared.pop() else {
+        return Ok(None);
+    };
+    let name = attachment.name.clone();
+    let payload = serde_json::to_value(&attachment)
+        .map_err(|_| "Unable to serialize the generated screenshot preview.".to_owned())?;
+    app.emit("attachment://generated", payload)
+        .map_err(|_| "Unable to deliver the generated screenshot to the interface.".to_owned())?;
+    Ok(Some(name))
+}
+
+fn screenshot_path_from_output(root: &Path, output: &str) -> Option<PathBuf> {
+    for line in output.lines().rev() {
+        let lower = line.to_ascii_lowercase();
+        let Some(png_end) = lower.rfind(".png") else {
+            continue;
+        };
+        let end = png_end + 4;
+        let start = lower
+            .find("playwright-cli")
+            .or_else(|| lower[..png_end].rfind(|character: char| character.is_whitespace()).map(|index| index + 1))
+            .unwrap_or(0);
+        let raw = line[start..end]
+            .trim()
+            .trim_matches(|character: char| matches!(character, '`' | '"' | '\'' | '(' | ')' | '[' | ']'));
+        if raw.is_empty() {
+            continue;
+        }
+        let candidate = PathBuf::from(raw);
+        let candidate = if candidate.is_absolute() {
+            candidate
+        } else {
+            root.join(candidate)
+        };
+        if let Ok(canonical) = candidate.canonicalize() {
+            if canonical.is_file() && canonical.extension().is_some_and(|ext| ext.eq_ignore_ascii_case("png")) {
+                return Some(canonical);
+            }
+        }
+    }
+    None
 }
 
 fn emit_activity(
