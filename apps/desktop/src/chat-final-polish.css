@@ -43,12 +43,12 @@
   animation: hawk-thinking-pulse 1.25s ease-in-out infinite;
 }
 
-.message--assistant[data-running="true"] .response-timing {
+.response-timing[role="status"] {
   position: relative;
   overflow: hidden;
 }
 
-.message--assistant[data-running="true"] .response-timing::after {
+.response-timing[role="status"]::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -72,7 +72,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .deep-thinking__detail::before,
-  .message--assistant[data-running="true"] .response-timing::after {
+  .response-timing[role="status"]::after {
     animation: none !important;
   }
 }
