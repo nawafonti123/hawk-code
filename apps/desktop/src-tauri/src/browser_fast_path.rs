@@ -278,8 +278,11 @@ fn extract_http_url(text: &str) -> Option<String> {
                 )
         });
         let lower = cleaned.to_ascii_lowercase();
-        (lower.starts_with("https://") || lower.starts_with("http://"))
-            .then(|| cleaned.trim_end_matches(['.', ':']).to_owned())
+        (lower.starts_with("https://") || lower.starts_with("http://")).then(|| {
+            cleaned
+                .trim_end_matches(|character: char| matches!(character, '.' | ':'))
+                .to_owned()
+        })
     })
 }
 
