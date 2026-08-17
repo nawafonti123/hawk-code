@@ -1,9 +1,11 @@
 import { FileText, ImageIcon, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { ChatAttachment } from "@hawk-code/shared-types";
 import { useWorkbenchStore } from "../store/workbench";
 
 export function AttachmentPreviewHost() {
+  const { t } = useTranslation();
   const messages = useWorkbenchStore((state) => state.messages);
   const composerAttachments = useWorkbenchStore((state) => state.attachments);
   const [preview, setPreview] = useState<ChatAttachment | null>(null);
@@ -84,7 +86,7 @@ export function AttachmentPreviewHost() {
             type="button"
             className="attachment-preview__close"
             onClick={() => setPreview(null)}
-            aria-label="Close preview"
+            aria-label={t("attachment.preview.close")}
           >
             <X size={18} />
           </button>
