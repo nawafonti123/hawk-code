@@ -1,8 +1,12 @@
+import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { FileText, ImageIcon, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { ChatAttachment } from "@hawk-code/shared-types";
+import {
+  IPC_PROTOCOL_VERSION,
+  type ChatAttachment,
+} from "@hawk-code/shared-types";
 import { isTauriRuntime } from "../lib/ipc";
 import { useWorkbenchStore } from "../store/workbench";
 
@@ -20,12 +24,8 @@ export function AttachmentPreviewHost() {
     void listen<ChatAttachment>("attachment://generated", (event) => {
       if (disposed) return;
       const attachment = event.payload;
-      if (!attachment?.name || attachment.kind !== "image" || !attachment.dataUrl) return;
-      setGeneratedAttachments((current) => {
-        const next = current.filter((item) => item.path !== attachment.path);
-        next.push(attachment);
-        return next.slice(-30);
-      });
+      if (!isPreviewableImage(attachment)) return;
+      setGeneratedAttachments((current) => rememberAttachment(current, attachment));
     }).then((stop) => {
       if (disposed) stop();
       else unlisten = stop;
@@ -46,9 +46,46 @@ export function AttachmentPreviewHost() {
   );
 
   useEffect(() => {
+    const openGeneratedPath = async (path: string) => {
+      const existing = [...allAttachments]
+        .reverse()
+        .find((item) => item.path === path && isPreviewableImage(item));
+      if (existing) {
+        setPreview(existing);
+        return;
+      }
+      if (!isTauriRuntime()) return;
+      try {
+        const response = await invoke<ChatAttachment[]>("prepare_attachments", {
+          request: {
+            protocolVersion: IPC_PROTOCOL_VERSION,
+            requestId: crypto.randomUUID(),
+            payload: { paths: [path] },
+          },
+        });
+        const attachment = response[0];
+        if (!attachment || !isPreviewableImage(attachment)) return;
+        setGeneratedAttachments((current) => rememberAttachment(current, attachment));
+        setPreview(attachment);
+      } catch {
+        // The screenshot may have been removed by Playwright cleanup. Keep the
+        // click safe instead of navigating the WebView away from HAWK Code.
+      }
+    };
+
     const handleClick = (event: MouseEvent) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
+
+      const pathButton = target.closest<HTMLElement>("[data-hawk-generated-path]");
+      if (pathButton) {
+        const path = pathButton.dataset.hawkGeneratedPath?.trim();
+        if (!path) return;
+        event.preventDefault();
+        event.stopPropagation();
+        void openGeneratedPath(path);
+        return;
+      }
 
       const generatedButton = target.closest<HTMLElement>(
         "[data-hawk-generated-attachment]",
@@ -59,9 +96,9 @@ export function AttachmentPreviewHost() {
         const attachment = [...generatedAttachments]
           .reverse()
           .find((item) => item.name === name);
-        if (!attachment) return;
         event.preventDefault();
-        setPreview(attachment);
+        event.stopPropagation();
+        if (attachment) setPreview(attachment);
         return;
       }
 
@@ -156,6 +193,23 @@ export function AttachmentPreviewHost() {
       </section>
     </div>
   );
+}
+
+function isPreviewableImage(
+  attachment: ChatAttachment | null | undefined,
+): attachment is ChatAttachment {
+  return Boolean(
+    attachment?.name && attachment.kind === "image" && attachment.dataUrl,
+  );
+}
+
+function rememberAttachment(
+  current: ChatAttachment[],
+  attachment: ChatAttachment,
+): ChatAttachment[] {
+  const next = current.filter((item) => item.path !== attachment.path);
+  next.push(attachment);
+  return next.slice(-30);
 }
 
 function formatBytes(bytes: number): string {
