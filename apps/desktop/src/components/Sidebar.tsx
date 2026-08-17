@@ -4,10 +4,10 @@ import {
   Folder,
   GitBranch,
   Globe2,
-  MessageSquare,
   Languages,
   ListTodo,
   LogOut,
+  MessageSquare,
   Moon,
   MoreHorizontal,
   Pencil,
@@ -112,12 +112,16 @@ export function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar__scroll">
+      <div className="sidebar__top">
         <div className="sidebar__header">
           <HawkBrand />
         </div>
 
-        <button className="new-task-button" type="button" onClick={createConversation}>
+        <button
+          className="new-task-button"
+          type="button"
+          onClick={createConversation}
+        >
           <Plus size={16} />
           <span>{t("sidebar.newTask")}</span>
         </button>
@@ -131,32 +135,49 @@ export function Sidebar() {
           <span>{t("sidebar.search")}</span>
           <kbd>Ctrl K</kbd>
         </button>
+      </div>
+
+      <div className="sidebar__scroll">
+        <div className="sidebar__eyebrow">
+          <span>{t("sidebar.navigation")}</span>
+        </div>
 
         <nav className="sidebar-nav" aria-label={t("sidebar.navigation")}>
-          {primaryNavigation.map(({ view, key, icon: Icon }) => (
-            <button
-              key={view}
-              type="button"
-              data-active={activeView === view}
-              onClick={() => setActiveView(view)}
-            >
-              <Icon size={17} />
-              <span>{t(`nav.${key}`)}</span>
-            </button>
-          ))}
+          {primaryNavigation.map(({ view, key, icon: Icon }) => {
+            const active = activeView === view;
+            return (
+              <button
+                key={view}
+                type="button"
+                data-active={active}
+                aria-current={active ? "page" : undefined}
+                onClick={() => setActiveView(view)}
+              >
+                <span className="sidebar-nav__icon" aria-hidden="true">
+                  <Icon size={16} />
+                </span>
+                <span>{t(`nav.${key}`)}</span>
+              </button>
+            );
+          })}
         </nav>
 
         <section className="sidebar-lists">
           <div className="sidebar__section-heading">
             <span>{t("sidebar.projects")}</span>
+            <span className="sidebar__eyebrow-count" aria-hidden="true">
+              {recentProjects.length}
+            </span>
             <button
               type="button"
+              title={t("sidebar.addProject")}
               aria-label={t("sidebar.addProject")}
               onClick={() => void openWorkspace()}
             >
-              <Plus size={15} />
+              <Plus size={14} />
             </button>
           </div>
+
           <button
             type="button"
             className="conversation-row conversation-row--general"
@@ -164,11 +185,14 @@ export function Sidebar() {
             onClick={openGeneralChat}
           >
             <span className="conversation-row__line">
-              <MessageSquare size={15} />
+              <span className="conversation-row__icon" aria-hidden="true">
+                <MessageSquare size={14} />
+              </span>
               <span>{t("sidebar.generalChat")}</span>
             </span>
             <small>{t("sidebar.generalChatHint")}</small>
           </button>
+
           {recentProjects.map((project) => (
             <div className="saved-project" key={project.path}>
               <button
@@ -176,97 +200,125 @@ export function Sidebar() {
                 data-active={workspacePath === project.path}
                 onClick={() => setWorkspace(project.path, project.name)}
               >
-                <Folder size={15} />
+                <span className="project-row__icon" aria-hidden="true">
+                  <Folder size={14} />
+                </span>
                 <span>{project.name}</span>
               </button>
               <button
                 type="button"
                 className="saved-project__remove"
+                title={t("sidebar.removeProject")}
                 aria-label={t("sidebar.removeProject")}
                 onClick={() => removeWorkspace(project.path)}
               >
-                <Trash2 size={14} />
+                <Trash2 size={13} />
               </button>
             </div>
           ))}
+
           <div className="sidebar__section-heading sidebar__section-heading--chats">
-            <span>{workspaceName ? t("sidebar.projectChats") : t("sidebar.generalChats")}</span>
-            <button type="button" aria-label={t("sidebar.newChat")} onClick={createConversation}>
+            <span>
+              {workspaceName
+                ? t("sidebar.projectChats")
+                : t("sidebar.generalChats")}
+            </span>
+            <span className="sidebar__eyebrow-count" aria-hidden="true">
+              {conversations.length}
+            </span>
+            <button
+              type="button"
+              title={t("sidebar.newChat")}
+              aria-label={t("sidebar.newChat")}
+              onClick={createConversation}
+            >
               <Plus size={14} />
             </button>
           </div>
+
           <div className="conversation-list">
-            {conversations.map((conversation) => (
-              <div
-                className="conversation-list__item"
-                data-active={conversation.id === conversationId}
-                key={conversation.id}
-              >
-                <button
-                  type="button"
-                  className="conversation-list__card"
-                  data-active={conversation.id === conversationId}
-                  onClick={() => selectConversation(conversation.id)}
+            {conversations.map((conversation) => {
+              const active = conversation.id === conversationId;
+              return (
+                <div
+                  className="conversation-list__item"
+                  data-active={active}
+                  key={conversation.id}
                 >
-                  <span className="conversation-list__icon" aria-hidden="true">
-                    <MessageSquare size={14} />
-                  </span>
-                  <span className="conversation-list__text">
-                    <strong>{conversation.title}</strong>
-                    <small>{conversation.messages.length ? t("sidebar.messageCount", { count: conversation.messages.length }) : t("sidebar.emptyChat")}</small>
-                  </span>
-                </button>
-                <div className="conversation-list__actions">
-                  <PopoverMenu
-                    label={t("sidebar.chatOptions")}
-                    placement="bottom-start"
-                    className="chat-menu"
-                    trigger={<MoreHorizontal size={16} />}
-                  >
-                    {(close) => (
-                      <div className="menu-list chat-menu-list">
-                        <button
-                          type="button"
-                          role="menuitem"
-                          onClick={() => {
-                            const title = window.prompt(
-                              t("sidebar.renameChat"),
-                              conversation.title,
-                            );
-                            if (title)
-                              renameConversation(conversation.id, title);
-                            close();
-                          }}
-                        >
-                          <Pencil size={16} />
-                          <span>{t("sidebar.renameChat")}</span>
-                        </button>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          data-danger
-                          onClick={() => {
-                            close();
-                            deleteConversation(conversation.id);
-                          }}
-                        >
-                          <Trash2 size={16} />
-                          <span>{t("sidebar.deleteChat")}</span>
-                        </button>
-                      </div>
-                    )}
-                  </PopoverMenu>
                   <button
                     type="button"
-                    className="conversation-list__remove"
-                    aria-label={t("sidebar.deleteChat")}
-                    onClick={() => deleteConversation(conversation.id)}
+                    className="conversation-list__card"
+                    data-active={active}
+                    aria-current={active ? "true" : undefined}
+                    onClick={() => selectConversation(conversation.id)}
                   >
-                    <Trash2 size={15} />
+                    <span className="conversation-list__icon" aria-hidden="true">
+                      <MessageSquare size={13} />
+                    </span>
+                    <span className="conversation-list__text">
+                      <strong>{conversation.title}</strong>
+                      <small>
+                        {conversation.messages.length
+                          ? t("sidebar.messageCount", {
+                              count: conversation.messages.length,
+                            })
+                          : t("sidebar.emptyChat")}
+                      </small>
+                    </span>
                   </button>
+
+                  <div className="conversation-list__actions">
+                    <PopoverMenu
+                      label={t("sidebar.chatOptions")}
+                      placement="bottom-start"
+                      className="chat-menu"
+                      trigger={<MoreHorizontal size={15} />}
+                    >
+                      {(close) => (
+                        <div className="menu-list chat-menu-list">
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              const title = window.prompt(
+                                t("sidebar.renameChat"),
+                                conversation.title,
+                              );
+                              if (title)
+                                renameConversation(conversation.id, title);
+                              close();
+                            }}
+                          >
+                            <Pencil size={16} />
+                            <span>{t("sidebar.renameChat")}</span>
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            data-danger
+                            onClick={() => {
+                              close();
+                              deleteConversation(conversation.id);
+                            }}
+                          >
+                            <Trash2 size={16} />
+                            <span>{t("sidebar.deleteChat")}</span>
+                          </button>
+                        </div>
+                      )}
+                    </PopoverMenu>
+                    <button
+                      type="button"
+                      className="conversation-list__remove"
+                      aria-label={t("sidebar.deleteChat")}
+                      onClick={() => deleteConversation(conversation.id)}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </div>
@@ -276,11 +328,15 @@ export function Sidebar() {
           className="sidebar-settings"
           type="button"
           data-active={activeView === "settings"}
+          aria-current={activeView === "settings" ? "page" : undefined}
           onClick={() => setActiveView("settings")}
         >
-          <Settings size={17} />
+          <span className="sidebar-settings__icon" aria-hidden="true">
+            <Settings size={16} />
+          </span>
           <span>{t("nav.settings")}</span>
         </button>
+
         <PopoverMenu
           label={t("account.menu")}
           placement="top-start"
@@ -295,7 +351,7 @@ export function Sidebar() {
                 <strong>{profile.name}</strong>
                 <small>{profile.email ?? t("account.local")}</small>
               </span>
-              <ChevronUp size={15} />
+              <ChevronUp size={14} />
             </>
           }
         >
