@@ -9,16 +9,28 @@ interface ParsedPlanningResponse {
 }
 
 export function shouldUseWorkspaceAgent(
-  _workspacePath: string | null,
+  workspacePath: string | null,
   planFirst: boolean,
   planningPhase: PlanningPhase,
-  _forceDesktopAgent = false,
+  forceDesktopAgent = false,
 ): boolean {
-  // Text conversations always use the desktop agent so HAWK can invoke
-  // browser/device/project tools when the user's request needs them. Planning
-  // kickoff remains tool-free, and image-only turns are still routed around
-  // this helper by the Composer to the dedicated vision path.
-  return !(planFirst && planningPhase === "kickoff");
+  return (
+    (Boolean(workspacePath) || forceDesktopAgent) &&
+    !(planFirst && planningPhase === "kickoff")
+  );
+}
+
+/**
+ * Keep ordinary general chat on the streaming chat path, but promote explicit
+ * browser/computer interaction requests to the desktop agent. A project that
+ * is already open is handled by shouldUseWorkspaceAgent regardless of text.
+ */
+export function shouldUseDesktopTools(content: string): boolean {
+  const value = content.trim().toLocaleLowerCase();
+  if (!value) return false;
+  return /(?:playwright|browser|browse|navigate|open\s+(?:the\s+)?(?:site|website|browser|url)|click\s+(?:the\s+)?|fill\s+(?:the\s+)?|press\s+(?:the\s+)?|screenshot\s+(?:the\s+)?(?:page|site)|test\s+(?:the\s+)?(?:site|website)|افتح\s+(?:المتصفح|الموقع|الرابط)|فتح\s+(?:المتصفح|الموقع|الرابط)|تصفح|تصفّح|تنقل\s+(?:في|داخل)\s+(?:الموقع|المتصفح)|انتقل\s+(?:الى|إلى)\s+(?:الموقع|الرابط)|اضغط\s+(?:على\s+)?|إضغط\s+(?:على\s+)?|امل[اأ]\s+|اكتب\s+(?:في|داخل)\s+(?:الحقل|الموقع|المتصفح)|صور\s+(?:الصفحة|الموقع)|لقطة\s+شاشة\s+(?:للصفحة|للموقع)|اختبر\s+(?:الموقع|الصفحة)|تحكم\s+(?:في|ب)\s+(?:المتصفح|الموقع|الكمبيوتر|الحاسوب))/iu.test(
+    value,
+  );
 }
 
 export function extractPlanningQuestions(
