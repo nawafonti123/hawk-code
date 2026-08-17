@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { CommandPalette } from "./components/CommandPalette";
+import { AttachmentPreviewHost } from "./components/AttachmentPreviewHost";
 import { AuthView } from "./components/AuthView";
 import { Composer } from "./components/Composer";
 import { Sidebar } from "./components/Sidebar";
@@ -58,6 +59,7 @@ export function App() {
         </div>
       </div>
       <CommandPalette />
+      <AttachmentPreviewHost />
       {notice ? (
         <div className="toast" role="status">
           <span>{notice}</span>
