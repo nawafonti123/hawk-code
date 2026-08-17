@@ -1,27 +1,70 @@
+import { listen } from "@tauri-apps/api/event";
 import { FileText, ImageIcon, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ChatAttachment } from "@hawk-code/shared-types";
+import { isTauriRuntime } from "../lib/ipc";
 import { useWorkbenchStore } from "../store/workbench";
 
 export function AttachmentPreviewHost() {
   const { t } = useTranslation();
   const messages = useWorkbenchStore((state) => state.messages);
   const composerAttachments = useWorkbenchStore((state) => state.attachments);
+  const [generatedAttachments, setGeneratedAttachments] = useState<ChatAttachment[]>([]);
   const [preview, setPreview] = useState<ChatAttachment | null>(null);
+
+  useEffect(() => {
+    if (!isTauriRuntime()) return;
+    let disposed = false;
+    let unlisten: (() => void) | undefined;
+    void listen<ChatAttachment>("attachment://generated", (event) => {
+      if (disposed) return;
+      const attachment = event.payload;
+      if (!attachment?.name || attachment.kind !== "image" || !attachment.dataUrl) return;
+      setGeneratedAttachments((current) => {
+        const next = current.filter((item) => item.path !== attachment.path);
+        next.push(attachment);
+        return next.slice(-30);
+      });
+    }).then((stop) => {
+      if (disposed) stop();
+      else unlisten = stop;
+    });
+    return () => {
+      disposed = true;
+      unlisten?.();
+    };
+  }, []);
 
   const allAttachments = useMemo(
     () => [
+      ...generatedAttachments,
       ...composerAttachments,
       ...messages.flatMap((message) => message.attachments ?? []),
     ],
-    [composerAttachments, messages],
+    [composerAttachments, generatedAttachments, messages],
   );
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
+
+      const generatedButton = target.closest<HTMLElement>(
+        "[data-hawk-generated-attachment]",
+      );
+      if (generatedButton) {
+        const name = generatedButton.dataset.hawkGeneratedAttachment?.trim();
+        if (!name) return;
+        const attachment = [...generatedAttachments]
+          .reverse()
+          .find((item) => item.name === name);
+        if (!attachment) return;
+        event.preventDefault();
+        setPreview(attachment);
+        return;
+      }
+
       if (target.closest("button")) return;
 
       const image = target.closest<HTMLImageElement>(
@@ -43,7 +86,7 @@ export function AttachmentPreviewHost() {
 
     document.addEventListener("click", handleClick, true);
     return () => document.removeEventListener("click", handleClick, true);
-  }, [allAttachments]);
+  }, [allAttachments, generatedAttachments]);
 
   useEffect(() => {
     if (!preview) return;
