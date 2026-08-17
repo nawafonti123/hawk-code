@@ -26,8 +26,13 @@ impl ProviderRuntime {
     pub fn new() -> Self {
         Self {
             cancellation: Mutex::new(None),
+            // Modal cold starts plus a local 30B agent/tool round can legitimately
+            // exceed three minutes. Keep the desktop request alive up to the same
+            // order of magnitude as the Modal function timeout, while retaining a
+            // short connection timeout so genuinely unreachable endpoints fail fast.
             client: Client::builder()
-                .timeout(std::time::Duration::from_secs(180))
+                .connect_timeout(std::time::Duration::from_secs(30))
+                .timeout(std::time::Duration::from_secs(900))
                 .build()
                 .expect("failed to create the provider HTTP client"),
         }
