@@ -102,7 +102,7 @@ export interface ChatAttachment {
   path: string;
   mimeType: string;
   size: number;
-  kind: "image" | "text";
+  kind: "image" | "text" | "pdf";
   textContent?: string | undefined;
   dataUrl?: string | undefined;
 }
