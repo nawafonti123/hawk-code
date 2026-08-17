@@ -19,6 +19,7 @@ import {
   type WorkspaceValidation,
 } from "@hawk-code/shared-types";
 import { z } from "zod";
+import { buildConversationMemoryContext } from "./conversation-memory";
 
 const runtimeStatusSchema = z.object({
   protocolVersion: z.literal(IPC_PROTOCOL_VERSION),
@@ -74,7 +75,7 @@ const gitFileChangeSchema = z.object({
 const gitStatusSchema = z.object({
   branch: z.string(),
   clean: z.boolean(),
-  entries: z.array(z.string()),
+  entries: z.array(gitFileChangeSchema),
   fileCount: z.number().nonnegative(),
   additions: z.number().nonnegative(),
   deletions: z.number().nonnegative(),
@@ -140,6 +141,11 @@ function request<TPayload>(payload: TPayload): IpcRequest<TPayload> {
     requestId: crypto.randomUUID(),
     payload,
   };
+}
+
+function systemPromptWithMemory(systemPrompt: string, messages: ChatMessage[]): string {
+  const memory = buildConversationMemoryContext(messages);
+  return memory ? `${systemPrompt}\n\n${memory}` : systemPrompt;
 }
 
 export function isTauriRuntime(): boolean {
@@ -403,6 +409,7 @@ export async function streamQwenChat(
 ): Promise<{ model: string; usage: UsageSummary }> {
   requireDesktop();
   const requestId = crypto.randomUUID();
+  const enhancedSystemPrompt = systemPromptWithMemory(systemPrompt, messages);
   const unlisten = await listen<{ requestId: string; delta: string }>(
     "qwen://delta",
     (event) => {
@@ -415,7 +422,7 @@ export async function streamQwenChat(
         requestId,
         config,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: enhancedSystemPrompt },
           ...messages.map(({ role, content, attachments }) => {
             if (!attachments?.length) return { role, content };
             const textFiles = attachments.filter(
@@ -464,6 +471,7 @@ export async function streamQwenAgent(
 ): Promise<{ model: string; usage: UsageSummary }> {
   requireDesktop();
   const requestId = crypto.randomUUID();
+  const enhancedSystemPrompt = systemPromptWithMemory(systemPrompt, messages);
   const [unlistenDelta, unlistenActivity] = await Promise.all([
     listen<{ requestId: string; delta: string }>("qwen://delta", (event) => {
       if (event.payload.requestId === requestId) onDelta(event.payload.delta);
@@ -491,7 +499,7 @@ export async function streamQwenAgent(
         workspacePath,
         permissionProfile,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: enhancedSystemPrompt },
           ...toProviderMessages(messages),
         ],
       }),
