@@ -9,15 +9,16 @@ interface ParsedPlanningResponse {
 }
 
 export function shouldUseWorkspaceAgent(
-  workspacePath: string | null,
+  _workspacePath: string | null,
   planFirst: boolean,
   planningPhase: PlanningPhase,
-  forceDesktopAgent = false,
+  _forceDesktopAgent = false,
 ): boolean {
-  return (
-    (Boolean(workspacePath) || forceDesktopAgent) &&
-    !(planFirst && planningPhase === "kickoff")
-  );
+  // Text conversations always use the desktop agent so HAWK can invoke
+  // browser/device/project tools when the user's request needs them. Planning
+  // kickoff remains tool-free, and image-only turns are still routed around
+  // this helper by the Composer to the dedicated vision path.
+  return !(planFirst && planningPhase === "kickoff");
 }
 
 export function extractPlanningQuestions(
