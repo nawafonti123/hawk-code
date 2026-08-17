@@ -61,19 +61,54 @@ function markdownComponents(
         </code>
       );
     },
-    a: ({ href, children }) => (
-      <a href={href} target="_blank" rel="noreferrer">
-        {children}
-      </a>
-    ),
+    a: ({ href, children }) => {
+      const generatedPath = generatedAttachmentPath(href);
+      if (generatedPath) {
+        return (
+          <button
+            type="button"
+            className="generated-attachment-link"
+            data-hawk-generated-path={generatedPath}
+            title="فتح لقطة الشاشة داخل HAWK Code"
+          >
+            <ImageIcon size={13} aria-hidden="true" />
+            <span>{children}</span>
+          </button>
+        );
+      }
+      return (
+        <a href={href} target="_blank" rel="noreferrer">
+          {children}
+        </a>
+      );
+    },
   };
+}
+
+function generatedAttachmentPath(href?: string): string | null {
+  const prefix = "#hawk-attachment-";
+  if (!href?.startsWith(prefix)) return null;
+  const encoded = href.slice(prefix.length);
+  if (!encoded) return null;
+  try {
+    let base64 = encoded.replace(/-/gu, "+").replace(/_/gu, "/");
+    base64 += "=".repeat((4 - (base64.length % 4)) % 4);
+    const binary = window.atob(base64);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const path = new TextDecoder().decode(bytes).trim();
+    return path || null;
+  } catch {
+    return null;
+  }
 }
 
 function generatedImageName(value: string): string | null {
   const normalized = value.trim().replace(/\\/gu, "/");
   const filename = normalized.split("/").pop()?.trim() ?? "";
-  if (!/^playwright-cli.*\.(?:png|jpe?g|webp)$/iu.test(normalized) &&
-      !/^page-.*\.(?:png|jpe?g|webp)$/iu.test(filename)) {
+  if (
+    !/^playwright-cli.*\.(?:png|jpe?g|webp)$/iu.test(normalized) &&
+    !/^page-.*\.(?:png|jpe?g|webp)$/iu.test(filename)
+  ) {
     return null;
   }
   return filename || null;
