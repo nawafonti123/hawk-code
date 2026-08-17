@@ -9,28 +9,16 @@ interface ParsedPlanningResponse {
 }
 
 export function shouldUseWorkspaceAgent(
-  workspacePath: string | null,
+  _workspacePath: string | null,
   planFirst: boolean,
   planningPhase: PlanningPhase,
-  forceDesktopAgent = false,
+  _forceDesktopAgent = false,
 ): boolean {
-  return (
-    (Boolean(workspacePath) || forceDesktopAgent) &&
-    !(planFirst && planningPhase === "kickoff")
-  );
-}
-
-/**
- * Keep ordinary general chat on the streaming chat path, but promote explicit
- * browser/computer interaction requests to the desktop agent. A project that
- * is already open is handled by shouldUseWorkspaceAgent regardless of text.
- */
-export function shouldUseDesktopTools(content: string): boolean {
-  const value = content.trim().toLocaleLowerCase();
-  if (!value) return false;
-  return /(?:playwright|browser|browse|navigate|open\s+(?:the\s+)?(?:site|website|browser|url)|click\s+(?:the\s+)?|fill\s+(?:the\s+)?|press\s+(?:the\s+)?|screenshot\s+(?:the\s+)?(?:page|site)|test\s+(?:the\s+)?(?:site|website)|افتح\s+(?:المتصفح|الموقع|الرابط)|فتح\s+(?:المتصفح|الموقع|الرابط)|تصفح|تصفّح|تنقل\s+(?:في|داخل)\s+(?:الموقع|المتصفح)|انتقل\s+(?:الى|إلى)\s+(?:الموقع|الرابط)|اضغط\s+(?:على\s+)?|إضغط\s+(?:على\s+)?|امل[اأ]\s+|اكتب\s+(?:في|داخل)\s+(?:الحقل|الموقع|المتصفح)|صور\s+(?:الصفحة|الموقع)|لقطة\s+شاشة\s+(?:للصفحة|للموقع)|اختبر\s+(?:الموقع|الصفحة)|تحكم\s+(?:في|ب)\s+(?:المتصفح|الموقع|الكمبيوتر|الحاسوب))/iu.test(
-    value,
-  );
+  // Every text turn goes through the desktop agent so capabilities such as
+  // Playwright can be selected dynamically by tool_choice=auto when the user
+  // actually asks for browser/computer work. Planning kickoff stays tool-free,
+  // and image turns bypass this helper through the dedicated vision route.
+  return !(planFirst && planningPhase === "kickoff");
 }
 
 export function extractPlanningQuestions(
