@@ -75,7 +75,7 @@ const gitFileChangeSchema = z.object({
 const gitStatusSchema = z.object({
   branch: z.string(),
   clean: z.boolean(),
-  entries: z.array(gitFileChangeSchema),
+  entries: z.array(z.string()),
   fileCount: z.number().nonnegative(),
   additions: z.number().nonnegative(),
   deletions: z.number().nonnegative(),
