@@ -194,27 +194,29 @@ export function Composer() {
       options?: { mode?: RunMode; instructions?: string[] },
     ) => {
       const mode = options?.mode ?? "normal";
+      const latestUserMessage = [...conversation]
+        .reverse()
+        .find((message) => message.role === "user");
+      const hasImageAttachments =
+        latestUserMessage?.attachments?.some(
+          (attachment) => attachment.kind === "image",
+        ) ?? false;
       const requestModel = resolveChatModel(
         activeModel,
         hawkBaseUrl,
-        conversation.some((message) =>
-          message.attachments?.some(
-            (attachment) => attachment.kind === "image",
-          ),
-        ),
+        hasImageAttachments,
       );
-      const hasImageAttachments = conversation.some((message) =>
-        message.attachments?.some(
-          (attachment) => attachment.kind === "image",
-        ),
-      );
+      const useWorkspaceAgent =
+        !hasImageAttachments &&
+        shouldUseWorkspaceAgent(workspacePath, planFirst, planningPhase);
       if (hasImageAttachments && activeModel === "qwen3-coder-30b-a3b-instruct") {
         setNotice(t("composer.visionAnalyzing"));
       } else if (requestModel !== activeModel) {
         setNotice(t("composer.visionFallback"));
       }
       const assistantId = beginAssistant();
-      const planningKickoff = planFirst && planningPhase === "kickoff";
+      const planningKickoff =
+        !hasImageAttachments && planFirst && planningPhase === "kickoff";
       const continuation =
         mode === "continue"
           ? "The previous response was interrupted before it finished. Continue from the exact point where the visible partial response stops. Do not repeat anything that is already written; pick up seamlessly and complete the answer."
@@ -238,13 +240,16 @@ export function Composer() {
           : "",
         "You have access to specialized skills that enhance your capabilities. Available skills: hawk-graph, project-analysis, git-review, test-planning, security-review, ui-ux-pro, responsive-design, dark-mode, animation-pro, accessibility, performance, i18n-pro, api-design, database-design, error-handling, code-review, refactoring, documentation, state-management, ci-cd, docker-pro, monitoring, git-workflow, testing-pro.",
         "Do NOT request skills unless absolutely necessary. Skill requests are only for tasks that are deeply specialized (e.g., writing accessibility audits, Docker security hardening). For general coding, explanations, image analysis, or chat — do NOT use [SKILL_REQUEST]. Maximum 1 skill request per response, and only when the user explicitly asks for that type of work. Format if needed: [SKILL_REQUEST: skill-id] reason.",
+        hasImageAttachments
+          ? "The current user turn includes image attachments. Analyze the images directly from the provided visual context and answer immediately. Do not inspect the workspace, Git history, project graph, or invoke project tools for this turn. Focus only on the user's image request."
+          : "",
         planningKickoff
           ? 'Planning-first kickoff is active. This turn is planning only: do not call tools, inspect files, edit anything, or start implementation. First restate the goal briefly, then provide an initial plan of 3-7 concrete steps. Do not write the questions as ordinary prose. End with exactly one fenced ```hawk-questions JSON block shaped as {"questions":[{"id":"q1","question":"Question text","options":["Option A","Option B","Option C"]}]}. Include 2-5 focused questions and 2-5 concise, mutually exclusive options per question. The interface will render them as clickable choices. Then wait for the user.'
-          : planFirst && planningPhase === "awaiting_answers"
+          : !hasImageAttachments && planFirst && planningPhase === "awaiting_answers"
             ? "The user is answering the planning questions. Integrate those answers, state the finalized plan concisely, then execute it with the available workspace tools. Ask another question only if execution would otherwise be impossible or materially unsafe."
-            : planFirst
+            : !hasImageAttachments && planFirst
               ? "Planning-first mode is active and the plan has been agreed. Follow the plan, report meaningful progress, and use workspace tools for verifiable execution."
-              : "Planning-first mode is disabled; respond directly while still noting material risks.",
+              : "Planning-first mode is disabled for this turn; respond directly while still noting material risks.",
         "Use workspace tools for every request that asks you to inspect, review, modify, test, or explain the active project.",
         "Never claim that you read, changed, tested, or opened something unless the matching tool completed successfully.",
         "HAWK Graph persistent project memory is built in. It already synchronizes the project before each task, preserves the full hierarchy and cached text locally, and refreshes only added, modified, or deleted files. Never rescan or reread the whole project on later requests. Use project_graph_query to recall relevant cached code, project_graph_structure for the saved hierarchy, and read_file only for an exact focused file when necessary.",
@@ -258,11 +263,7 @@ export function Composer() {
         continuation,
       ].join(" ");
       try {
-        const result = shouldUseWorkspaceAgent(
-          workspacePath,
-          planFirst,
-          planningPhase,
-        )
+        const result = useWorkspaceAgent
           ? await streamQwenAgent(
               { baseUrl: hawkBaseUrl, model: requestModel },
               conversation,
@@ -287,7 +288,11 @@ export function Composer() {
             setAssistantPlanning(assistantId, parsed.content, parsed.questions);
           }
           setPlanningPhase("awaiting_answers");
-        } else if (planFirst && planningPhase === "awaiting_answers")
+        } else if (
+          !hasImageAttachments &&
+          planFirst &&
+          planningPhase === "awaiting_answers"
+        )
           setPlanningPhase("executing");
         finishAssistant(assistantId, result.usage);
       } catch (error) {
