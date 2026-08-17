@@ -124,7 +124,6 @@ def _analyze_images_in_messages(
         if not images:
             result.append(msg)
             continue
-        # Analyze each image through Hawk Vision endpoint
         descriptions: list[str] = []
         for idx, img_url in enumerate(images):
             desc = _call_vision_endpoint(img_url)
@@ -172,12 +171,17 @@ class HAWKModel:
             cache_dir="/root/.cache/huggingface",
             token=os.getenv("HF_TOKEN") or None,
         )
+        # HAWK K3 is an agentic coding model. The plain `chatml` formatter only
+        # serializes conversation text and can cause the model to ignore the
+        # OpenAI `tools` field entirely. `chatml-function-calling` is the
+        # llama-cpp-python formatter specifically intended to expose OpenAI
+        # tool schemas and parse structured calls back into `tool_calls`.
         self.model = Llama(
             model_path=model_path,
             n_ctx=DEFAULT_CONTEXT,
             n_gpu_layers=-1,
             n_batch=512,
-            chat_format="chatml",
+            chat_format="chatml-function-calling",
             verbose=False,
         )
 
@@ -241,8 +245,6 @@ class HAWKModel:
 
         return api
 
-    # Keep a single OpenAI-compatible origin so the desktop client can append
-    # /chat/completions and /models to a base URL ending in /v1.
     async def _legacy_completions(self, request: Any) -> Any:
         from fastapi.responses import JSONResponse, StreamingResponse
         from fastapi import Request
