@@ -28,6 +28,15 @@ MODEL_FILE = os.getenv(
 )
 MODEL_ID = "qwen3-coder-30b-a3b-instruct"
 DEFAULT_CONTEXT = 32_768
+# Keep scale-to-zero for cost control, but retain an already-loaded L4 long
+# enough to make normal follow-up messages avoid the ~20s model cold start.
+WARM_IDLE_SECONDS = int(os.getenv("HAWK_WARM_IDLE_SECONDS", "180"))
+# A larger logical prompt batch improves prompt ingestion on the L4 while the
+# physical micro-batch stays conservative for VRAM stability. This changes
+# throughput, not model quality or context size.
+PROMPT_BATCH = int(os.getenv("HAWK_PROMPT_BATCH", "1024"))
+PROMPT_UBATCH = int(os.getenv("HAWK_PROMPT_UBATCH", "512"))
+PROMPT_CACHE_BYTES = int(os.getenv("HAWK_PROMPT_CACHE_BYTES", str(2 << 30)))
 VISION_PROMPT = "Describe this image in detail for an AI coding assistant. Include: what the image shows (UI, diagram, error, code screenshot, etc.), any visible text/code, layout, colors, and any issues or elements the user might want to discuss. Be thorough but concise."
 
 app = modal.App(APP_NAME)
@@ -156,14 +165,14 @@ def _analyze_images_in_messages(
     min_containers=0,
     max_containers=1,
     buffer_containers=0,
-    scaledown_window=60,
+    scaledown_window=WARM_IDLE_SECONDS,
     timeout=900,
 )
 class HAWKModel:
     @modal.enter()
     def load(self) -> None:
         from huggingface_hub import hf_hub_download
-        from llama_cpp import Llama
+        from llama_cpp import Llama, LlamaRAMCache
 
         model_path = hf_hub_download(
             repo_id=MODEL_REPO,
@@ -180,10 +189,17 @@ class HAWKModel:
             model_path=model_path,
             n_ctx=DEFAULT_CONTEXT,
             n_gpu_layers=-1,
-            n_batch=512,
+            n_batch=PROMPT_BATCH,
+            n_ubatch=PROMPT_UBATCH,
+            offload_kqv=True,
+            flash_attn=True,
             chat_format="chatml-function-calling",
             verbose=False,
         )
+        # Exact KV/prompt-state reuse accelerates repeated system prompts and
+        # multi-step agent loops. It does not summarize, quantize, or remove
+        # context, so answer quality remains unchanged.
+        self.model.set_cache(LlamaRAMCache(capacity_bytes=PROMPT_CACHE_BYTES))
 
     @modal.asgi_app()
     def web(self) -> Any:
