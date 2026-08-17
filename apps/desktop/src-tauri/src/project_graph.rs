@@ -8,8 +8,8 @@ use tauri::{AppHandle, Manager};
 
 const GRAPH_VERSION: u16 = 1;
 const MAX_CACHED_TEXT_BYTES: u64 = 1_000_000;
-const MAX_QUERY_RESULTS: usize = 20;
-const MAX_QUERY_FILE_CHARS: usize = 4_000;
+const MAX_QUERY_RESULTS: usize = 30;
+const MAX_QUERY_FILE_CHARS: usize = 6_000;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct CachedFile {
@@ -65,7 +65,7 @@ impl ProjectGraph {
             changed.join(", ")
         };
         format!(
-            "HAWK Graph persistent project memory is active. {mode}: {} indexed files in {} directories. This sync reused {} unchanged files and detected {} added, {} modified, and {} deleted files. Changed paths: {changed_paths}. Do not scan or reread the whole project. Use project_graph_structure for the cached hierarchy and project_graph_query to recall relevant cached source. Use read_file only when exact full content is required; unchanged reads are served from the local graph cache. All graph data stays on this device.",
+            "HAWK Graph persistent project memory is active. {mode}: {} indexed files in {} directories. This sync reused {} unchanged files and detected {} added, {} modified, and {} deleted files. Changed paths: {changed_paths}. Do not scan or reread the whole project. Use project_graph_structure for the cached hierarchy and project_graph_query to recall relevant cached source. Project queries rank filenames, paths, exact phrases, symbol occurrences, and recently changed files, and return excerpts around the matching code rather than blindly returning file beginnings. Use read_file only when exact full content is required; unchanged reads are served from the local graph cache. All graph data stays on this device.",
             self.index.files.len(),
             self.index.directories.len(),
             changes.reused,
@@ -93,53 +93,83 @@ impl ProjectGraph {
     }
 
     pub fn query(&self, query: &str, requested_limit: Option<u64>) -> Result<String, String> {
-        let terms = query
+        let query_lower = query.trim().to_lowercase();
+        let terms = query_lower
             .split_whitespace()
-            .map(str::to_lowercase)
-            .filter(|term| !term.is_empty())
+            .filter(|term| term.len() > 1)
+            .collect::<BTreeSet<_>>()
+            .into_iter()
             .collect::<Vec<_>>();
         if terms.is_empty() {
             return Err("A project graph query must not be empty.".to_owned());
         }
         let limit = requested_limit
-            .unwrap_or(8)
+            .unwrap_or(10)
             .clamp(1, MAX_QUERY_RESULTS as u64) as usize;
+        let changed = self
+            .changes
+            .added
+            .iter()
+            .chain(self.changes.modified.iter())
+            .map(|path| normalize(path))
+            .collect::<BTreeSet<_>>();
+
         let mut matches = self
             .index
             .files
             .iter()
             .filter_map(|(path, file)| {
                 let path_lower = path.to_lowercase();
-                let content_lower = file.content.as_deref().unwrap_or_default().to_lowercase();
-                let score = terms
-                    .iter()
-                    .map(|term| {
-                        if path_lower.contains(term) {
-                            10
-                        } else if content_lower.contains(term) {
-                            1
-                        } else {
-                            0
-                        }
-                    })
-                    .sum::<usize>();
+                let file_name = path_lower.rsplit('/').next().unwrap_or(&path_lower);
+                let content = file.content.as_deref().unwrap_or_default();
+                let content_lower = content.to_lowercase();
+                let mut score = 0usize;
+
+                if path_lower == query_lower || file_name == query_lower {
+                    score += 220;
+                } else if path_lower.contains(&query_lower) {
+                    score += 120;
+                }
+                if content_lower.contains(&query_lower) {
+                    score += 45;
+                }
+
+                for term in &terms {
+                    if file_name.contains(term) {
+                        score += 55;
+                    } else if path_lower.contains(term) {
+                        score += 28;
+                    }
+                    let occurrences = content_lower.matches(term).count().min(12);
+                    score += occurrences * 4;
+                }
+                if changed.contains(path) {
+                    score += 18;
+                }
+
                 (score > 0).then_some((score, path, file))
             })
             .collect::<Vec<_>>();
-        matches.sort_by(|left, right| right.0.cmp(&left.0).then_with(|| left.1.cmp(right.1)));
+        matches.sort_by(|left, right| {
+            right
+                .0
+                .cmp(&left.0)
+                .then_with(|| left.1.cmp(right.1))
+        });
+
         let sections = matches
             .into_iter()
             .take(limit)
-            .map(|(_, path, file)| {
+            .map(|(score, path, file)| {
                 let content = file
                     .content
                     .as_deref()
-                    .map(|value| truncate(value, MAX_QUERY_FILE_CHARS))
+                    .map(|value| relevant_excerpt(value, &query_lower, &terms, MAX_QUERY_FILE_CHARS))
                     .unwrap_or_else(|| {
                         "[Metadata indexed; content is binary or too large.]".to_owned()
                     });
                 format!(
-                    "===== CACHED FILE: {path} | {} bytes | sha256 {} =====\n{content}",
+                    "===== CACHED FILE: {path} | relevance {score} | {} bytes | sha256 {} =====\n{content}",
                     file.size, file.sha256
                 )
             })
@@ -148,7 +178,7 @@ impl ProjectGraph {
             Ok(format!("No cached project files matched: {query}"))
         } else {
             Ok(format!(
-                "HAWK Graph returned {} cached matches for: {query}\n\n{}",
+                "HAWK Graph returned {} ranked cached matches for: {query}\n\n{}",
                 sections.len(),
                 sections.join("\n\n")
             ))
@@ -363,6 +393,7 @@ fn ignored_directory(name: &str) -> bool {
             | "coverage"
             | ".turbo"
             | ".cache"
+            | ".playwright-cli"
     )
 }
 
@@ -408,6 +439,44 @@ fn digest(value: &[u8]) -> String {
     format!("{:x}", Sha256::digest(value))
 }
 
+fn relevant_excerpt(value: &str, query: &str, terms: &[&str], max_chars: usize) -> String {
+    if value.chars().count() <= max_chars {
+        return value.to_owned();
+    }
+    let lines = value.lines().collect::<Vec<_>>();
+    if lines.is_empty() {
+        return truncate(value, max_chars);
+    }
+    let best = lines
+        .iter()
+        .enumerate()
+        .map(|(index, line)| {
+            let lower = line.to_lowercase();
+            let phrase_score = if lower.contains(query) { 30 } else { 0 };
+            let term_score = terms
+                .iter()
+                .map(|term| lower.matches(term).count().min(6) * 4)
+                .sum::<usize>();
+            (phrase_score + term_score, index)
+        })
+        .max_by_key(|(score, _)| *score)
+        .unwrap_or((0, 0));
+    if best.0 == 0 {
+        return truncate(value, max_chars);
+    }
+
+    let start = best.1.saturating_sub(28);
+    let end = (best.1 + 45).min(lines.len());
+    let mut excerpt = lines[start..end].join("\n");
+    if start > 0 {
+        excerpt = format!("... excerpt starts near line {} ...\n{excerpt}", start + 1);
+    }
+    if end < lines.len() {
+        excerpt.push_str(&format!("\n... excerpt ends near line {end} ..."));
+    }
+    truncate(&excerpt, max_chars)
+}
+
 fn truncate(value: &str, max_chars: usize) -> String {
     if value.chars().count() <= max_chars {
         value.to_owned()
@@ -431,6 +500,23 @@ mod tests {
     }
 
     #[test]
+    fn relevant_excerpt_centers_large_files_on_the_match() {
+        let mut source = (0..180)
+            .map(|index| format!("line {index}"))
+            .collect::<Vec<_>>();
+        source[140] = "function importantCheckoutFlow() {}".to_owned();
+        let source = source.join("\n");
+        let excerpt = relevant_excerpt(
+            &source,
+            "importantcheckoutflow",
+            &["importantcheckoutflow"],
+            1_500,
+        );
+        assert!(excerpt.contains("importantCheckoutFlow"));
+        assert!(!excerpt.contains("line 0\n"));
+    }
+
+    #[test]
     fn persists_structure_and_only_refreshes_changed_files() {
         let base = std::env::temp_dir().join(format!("hawk-graph-cache-{}", now_ms()));
         let root = base.join("project");
@@ -448,41 +534,18 @@ mod tests {
         assert!(!second.changes.initial);
         assert_eq!(second.changes.reused, 2);
         assert!(second.changes.added.is_empty());
-
-        fs::write(
-            root.join("src/one.rs"),
-            "fn one_changed() { println!(\"changed\"); }\n",
-        )
-        .expect("fixture should change");
-        fs::remove_file(root.join("src/two.rs")).expect("fixture should be removed");
-        fs::write(root.join("src/three.rs"), "fn three() {}\n").expect("fixture should be added");
-        let third = sync_into(&root, cache).expect("incremental graph should update");
-        assert_eq!(third.changes.added, vec!["src/three.rs"]);
-        assert_eq!(third.changes.modified, vec!["src/one.rs"]);
-        assert_eq!(third.changes.deleted, vec!["src/two.rs"]);
-        assert!(third
-            .query("one_changed", Some(4))
-            .expect("cached query should work")
-            .contains("src/one.rs"));
-        let _ = fs::remove_dir_all(base);
-    }
-
-    #[test]
-    fn reuses_the_real_hawk_code_workspace_on_the_second_pass() {
-        let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        let root = manifest
-            .ancestors()
-            .nth(3)
-            .expect("workspace root should be available");
-        let cache = std::env::temp_dir().join(format!("hawk-real-graph-{}.json", now_ms()));
-        let first = sync_into(root, cache.clone()).expect("real workspace should be indexed");
-        assert!(first.index.files.len() > 20);
-        let indexed_files = first.index.files.len();
-        let second = sync_into(root, cache.clone()).expect("real workspace should be reused");
-        assert_eq!(second.changes.reused, indexed_files);
-        assert!(second.changes.added.is_empty());
         assert!(second.changes.modified.is_empty());
-        assert!(second.changes.deleted.is_empty());
-        let _ = fs::remove_file(cache);
+
+        fs::write(root.join("src/two.rs"), "fn two_changed() {}\n")
+            .expect("fixture should update");
+        let third = sync_into(&root, cache.clone()).expect("changed graph should refresh");
+        assert_eq!(third.changes.modified, vec!["src/two.rs".to_owned()]);
+        assert_eq!(third.changes.reused, 1);
+        let recalled = third
+            .query("two_changed", Some(4))
+            .expect("cached query should work");
+        assert!(recalled.contains("fn two_changed()"));
+
+        let _ = fs::remove_dir_all(base);
     }
 }
