@@ -9,6 +9,35 @@
   background: #f2f0e9;
 }
 
+.generated-attachment-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  margin: 0 2px;
+  padding: 2px 6px;
+  border: 1px solid rgba(184, 255, 69, 0.22);
+  border-radius: 7px;
+  background: rgba(184, 255, 69, 0.07);
+  color: inherit;
+  cursor: pointer;
+  vertical-align: baseline;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.generated-attachment-link:hover {
+  border-color: rgba(184, 255, 69, 0.46);
+  background: rgba(184, 255, 69, 0.13);
+  transform: translateY(-1px);
+}
+
+.generated-attachment-link code {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Do not expose verbose internal reasoning. Show a compact progress line while
  * the real tool/activity timeline remains available through the expandable row. */
 .deep-thinking__stages {
@@ -72,7 +101,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .deep-thinking__detail::before,
-  .response-timing[role="status"]::after {
+  .response-timing[role="status"]::after,
+  .generated-attachment-link {
     animation: none !important;
+    transition: none !important;
   }
 }
