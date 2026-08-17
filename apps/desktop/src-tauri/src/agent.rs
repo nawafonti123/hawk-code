@@ -2,7 +2,7 @@ use crate::provider::{
     resolve_api_key, response_error, usage_from_value, validate_config, ChatMessage, ChatResult,
     ProviderConfig, ProviderRuntime, UsageSummary,
 };
-use crate::{project, project_graph};
+use crate::{browser_automation, project, project_graph};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::HashSet;
@@ -106,9 +106,6 @@ pub async fn run(
             .as_array()
             .cloned()
             .unwrap_or_default();
-        // Some GGUF chat templates serialize tool calls into assistant text
-        // instead of the OpenAI `tool_calls` field. Normalize that legacy
-        // shape so the agent executes tools instead of showing raw JSON.
         if calls.is_empty() {
             if let Some(content) = message["content"].as_str() {
                 calls = parse_text_tool_calls(content);
@@ -297,7 +294,7 @@ fn tool_definitions() -> Value {
                     "type": "object",
                     "properties": {
                         "query": {"type": "string", "description": "Code symbol, feature, path, or text to recall"},
-                        "maxResults": {"type": "integer", "minimum": 1, "maximum": 20}
+                        "maxResults": {"type": "integer", "minimum": 1, "maximum": 30}
                     },
                     "required": ["query"]
                 }
@@ -336,6 +333,27 @@ fn tool_definitions() -> Value {
                 "name": "git_status",
                 "description": "Inspect the real Git status and line statistics for the active workspace.",
                 "parameters": {"type": "object", "properties": {}}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "browser_control",
+                "description": "Control a real Chromium browser through Playwright when the user asks HAWK to browse, navigate, inspect, click, fill, type, press keys, take a screenshot, or test a website. Start with open, then snapshot. Use snapshot refs/targets for interactions and take another snapshot after navigation or major DOM changes. Never use this tool for unrelated coding work.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "action": {
+                            "type": "string",
+                            "enum": ["open", "goto", "snapshot", "click", "fill", "type", "press", "screenshot", "back", "forward", "reload", "close"]
+                        },
+                        "url": {"type": "string", "description": "Required for open/goto; must use http or https"},
+                        "target": {"type": "string", "description": "Snapshot element reference or Playwright target used for click/fill"},
+                        "value": {"type": "string", "description": "Text for fill/type or keyboard key for press"},
+                        "fullPage": {"type": "boolean", "description": "Use full-page screenshot when true"}
+                    },
+                    "required": ["action"]
+                }
             }
         },
         {
@@ -420,6 +438,10 @@ async fn execute_tool(
         "git_status" => {
             serde_json::to_string_pretty(&project::git_status(root.to_string_lossy().as_ref())?)
                 .map_err(|_| "Unable to serialize Git status.".to_owned())
+        }
+        "browser_control" => {
+            require_edit_permission(permission)?;
+            browser_automation::run(root, args, cancellation).await
         }
         "replace_in_file" => {
             require_edit_permission(permission)?;
@@ -907,6 +929,7 @@ fn activity_detail(tool: &str, args: &Value) -> String {
             args["paths"].as_array().map(Vec::len).unwrap_or(0)
         ),
         "git_status" => "Inspecting project changes".to_owned(),
+        "browser_control" => browser_activity_detail(args),
         "replace_in_file" => format!("Editing {}", args["path"].as_str().unwrap_or("file")),
         "write_file" => format!("Writing {}", args["path"].as_str().unwrap_or("file")),
         "create_skill" => format!(
@@ -920,6 +943,24 @@ fn activity_detail(tool: &str, args: &Value) -> String {
         "list_android_devices" => "Checking USB-connected Android devices".to_owned(),
         "install_android_apk" => "Installing the requested APK on the connected Android phone".to_owned(),
         _ => format!("Running {tool}"),
+    }
+}
+
+fn browser_activity_detail(args: &Value) -> String {
+    match args["action"].as_str().unwrap_or("browser") {
+        "open" => format!("Opening {} in Playwright", args["url"].as_str().unwrap_or("browser")),
+        "goto" => format!("Navigating to {}", args["url"].as_str().unwrap_or("page")),
+        "snapshot" => "Reading the current browser page".to_owned(),
+        "click" => format!("Clicking {}", args["target"].as_str().unwrap_or("page element")),
+        "fill" => format!("Filling {}", args["target"].as_str().unwrap_or("page field")),
+        "type" => "Typing in the browser".to_owned(),
+        "press" => format!("Pressing {}", args["value"].as_str().unwrap_or("a key")),
+        "screenshot" => "Capturing the browser page".to_owned(),
+        "back" => "Going back in the browser".to_owned(),
+        "forward" => "Going forward in the browser".to_owned(),
+        "reload" => "Reloading the browser page".to_owned(),
+        "close" => "Closing the automated browser".to_owned(),
+        _ => "Controlling the browser".to_owned(),
     }
 }
 
@@ -938,7 +979,7 @@ fn activity_result_detail(tool: &str, state: &str, output: &str) -> String {
         "read_file" => format!("Read {} lines", output.lines().count()),
         "read_files" => truncate(output.lines().next().unwrap_or(output), 240),
         "git_status" => "Project changes inspected".to_owned(),
-        "replace_in_file" | "write_file" | "create_skill" | "run_check" | "install_android_apk" => {
+        "browser_control" | "replace_in_file" | "write_file" | "create_skill" | "run_check" | "install_android_apk" => {
             truncate(output.lines().next().unwrap_or(output), 240)
         }
         _ => "Completed".to_owned(),
