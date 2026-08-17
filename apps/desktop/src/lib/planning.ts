@@ -12,7 +12,6 @@ export function shouldUseWorkspaceAgent(
   _workspacePath: string | null,
   planFirst: boolean,
   planningPhase: PlanningPhase,
-  _forceDesktopAgent = false,
 ): boolean {
   // Every text turn goes through the desktop agent so capabilities such as
   // Playwright can be selected dynamically by tool_choice=auto when the user
