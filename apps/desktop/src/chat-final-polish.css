@@ -1,0 +1,78 @@
+/* Final conversation polish: keep reasoning compact and calm like a modern AI chat. */
+
+.attachment-preview__pdf {
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  border: 0;
+  border-radius: 10px;
+  background: #f2f0e9;
+}
+
+/* Do not expose verbose internal reasoning. Show a compact progress line while
+ * the real tool/activity timeline remains available through the expandable row. */
+.deep-thinking__stages {
+  display: none;
+}
+
+.deep-thinking {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.deep-thinking__detail {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 4px 8px;
+  color: #9b9d95;
+  font-size: 11px;
+}
+
+.deep-thinking__detail::before {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #b8ff45;
+  box-shadow: 0 0 0 4px rgba(184, 255, 69, 0.07);
+  content: "";
+  animation: hawk-thinking-pulse 1.25s ease-in-out infinite;
+}
+
+.message--assistant[data-running="true"] .response-timing {
+  position: relative;
+  overflow: hidden;
+}
+
+.message--assistant[data-running="true"] .response-timing::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 25%, rgba(242, 240, 233, 0.12) 48%, transparent 72%);
+  transform: translateX(-120%);
+  content: "";
+  animation: hawk-timing-sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes hawk-timing-sweep {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@media (max-height: 680px) {
+  .attachment-preview__pdf {
+    min-height: 420px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deep-thinking__detail::before,
+  .message--assistant[data-running="true"] .response-timing::after {
+    animation: none !important;
+  }
+}
