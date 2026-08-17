@@ -22,11 +22,55 @@ const STORAGE_PREFIX = "hawk.conversations.v2.";
 const MAX_MEMORY_ITEMS = 18;
 const MAX_MEMORY_CHARS = 7_500;
 const MAX_ITEM_CHARS = 900;
+const ALWAYS_RECENT_ITEMS = 4;
+
+const STOP_WORDS = new Set([
+  "the",
+  "and",
+  "for",
+  "with",
+  "this",
+  "that",
+  "from",
+  "have",
+  "what",
+  "when",
+  "where",
+  "will",
+  "want",
+  "just",
+  "into",
+  "about",
+  "على",
+  "الى",
+  "إلى",
+  "من",
+  "في",
+  "عن",
+  "هذا",
+  "هذه",
+  "الان",
+  "الآن",
+  "انا",
+  "أنا",
+  "ابي",
+  "أبي",
+  "اريد",
+  "أريد",
+  "يكون",
+  "تكون",
+  "كل",
+  "شي",
+  "شيء",
+  "يعني",
+]);
 
 /**
  * Builds a compact, local-only memory block from user messages stored in other
  * HAWK conversations. It deliberately remembers user-authored context only so
- * old assistant guesses never become durable facts.
+ * old assistant guesses never become durable facts. Relevant memories are
+ * ranked against the current request, while a few recent user statements are
+ * kept to preserve continuity even when wording changes.
  */
 export function buildConversationMemoryContext(
   currentMessages: ChatMessage[],
@@ -34,6 +78,10 @@ export function buildConversationMemoryContext(
   if (typeof window === "undefined") return "";
   const currentIds = new Set(currentMessages.map((message) => message.id));
   const items: MemoryItem[] = [];
+  const latestUserText = [...currentMessages]
+    .reverse()
+    .find((message) => message.role === "user")?.content;
+  const queryTerms = meaningfulTerms(latestUserText ?? "");
 
   try {
     for (let index = 0; index < window.localStorage.length; index += 1) {
@@ -83,15 +131,15 @@ export function buildConversationMemoryContext(
     return "";
   }
 
-  items.sort((left, right) =>
+  const unique = dedupe(items).sort((left, right) =>
     right.createdAt.localeCompare(left.createdAt),
   );
-  const selected = dedupe(items).slice(0, MAX_MEMORY_ITEMS).reverse();
+  const selected = selectMemories(unique, queryTerms);
   if (!selected.length) return "";
 
   const lines: string[] = [];
   let used = 0;
-  for (const item of selected) {
+  for (const item of selected.reverse()) {
     const line = `- [${item.scope} / ${item.title}] ${item.content}`;
     if (used + line.length > MAX_MEMORY_CHARS) break;
     lines.push(line);
@@ -101,9 +149,64 @@ export function buildConversationMemoryContext(
 
   return [
     "HAWK cross-conversation memory (local user-authored context):",
-    "Use these prior user statements only when relevant. Prefer the current request when it conflicts with older context. Do not claim a memory is current if the user has changed it.",
+    "Use these prior user statements only when relevant. Prefer the current request when it conflicts with older context. Do not claim an older memory is current when the user has changed it. Never treat old assistant output as memory.",
     ...lines,
   ].join("\n");
+}
+
+function selectMemories(items: MemoryItem[], queryTerms: string[]): MemoryItem[] {
+  const scored = items
+    .map((item) => ({ item, score: relevanceScore(item, queryTerms) }))
+    .filter(({ score }) => score > 0)
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        right.item.createdAt.localeCompare(left.item.createdAt),
+    );
+
+  const selected = scored
+    .slice(0, MAX_MEMORY_ITEMS - ALWAYS_RECENT_ITEMS)
+    .map(({ item }) => item);
+  const selectedIds = new Set(selected.map((item) => item.id));
+  for (const recent of items) {
+    if (selected.length >= MAX_MEMORY_ITEMS) break;
+    if (selectedIds.has(recent.id)) continue;
+    selected.push(recent);
+    selectedIds.add(recent.id);
+    if (selected.length >= ALWAYS_RECENT_ITEMS + scored.length) break;
+  }
+  return selected.slice(0, MAX_MEMORY_ITEMS);
+}
+
+function relevanceScore(item: MemoryItem, queryTerms: string[]): number {
+  if (!queryTerms.length) return 1;
+  const haystack = `${item.scope} ${item.title} ${item.content}`.toLocaleLowerCase();
+  let score = 0;
+  for (const term of queryTerms) {
+    if (haystack.includes(term)) score += 12;
+  }
+  if (
+    /(?:\bmy\b|\bi prefer\b|\bi like\b|\bi need\b|مشروعي|موقعي|افضل|أفضل|احب|أحب|عندي|اسمي)/iu.test(
+      item.content,
+    )
+  )
+    score += 3;
+  return score;
+}
+
+function meaningfulTerms(value: string): string[] {
+  return [
+    ...new Set(
+      value
+        .toLocaleLowerCase()
+        .split(/[^\p{L}\p{N}_-]+/u)
+        .map((term) => term.trim())
+        .filter(
+          (term) =>
+            term.length >= 3 && !STOP_WORDS.has(term) && !/^\d+$/u.test(term),
+        ),
+    ),
+  ].slice(0, 24);
 }
 
 function dedupe(items: MemoryItem[]): MemoryItem[] {
@@ -128,7 +231,9 @@ function compact(value: string): string {
 function decodeScope(encoded: string): string {
   try {
     const decoded = decodeURIComponent(encoded);
-    return decoded === "general" ? "general" : decoded.split(/[\\/]/u).at(-1) || "project";
+    return decoded === "general"
+      ? "general"
+      : decoded.split(/[\\/]/u).at(-1) || "project";
   } catch {
     return "conversation";
   }
