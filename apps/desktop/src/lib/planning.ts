@@ -12,8 +12,12 @@ export function shouldUseWorkspaceAgent(
   workspacePath: string | null,
   planFirst: boolean,
   planningPhase: PlanningPhase,
+  forceDesktopAgent = false,
 ): boolean {
-  return Boolean(workspacePath) && !(planFirst && planningPhase === "kickoff");
+  return (
+    (Boolean(workspacePath) || forceDesktopAgent) &&
+    !(planFirst && planningPhase === "kickoff")
+  );
 }
 
 export function extractPlanningQuestions(
