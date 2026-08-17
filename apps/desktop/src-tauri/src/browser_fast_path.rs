@@ -1,6 +1,7 @@
 use crate::agent::AgentPayload;
 use crate::{attachments, browser_automation};
 use crate::provider::{self, ChatMessage, ChatPayload, ChatResult, ProviderRuntime};
+use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::fs;
@@ -22,6 +23,18 @@ struct ActivityEvent {
     state: String,
     detail: String,
     file_path: Option<String>,
+}
+
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+struct DeltaEvent {
+    request_id: String,
+    delta: String,
+}
+
+struct GeneratedScreenshot {
+    name: String,
+    path: String,
 }
 
 pub async fn try_run(
@@ -83,7 +96,7 @@ pub async fn try_run(
         None
     };
 
-    let generated_screenshot_name = screenshot_output
+    let generated_screenshot = screenshot_output
         .as_deref()
         .and_then(|output| emit_generated_screenshot(app, &root, output).ok().flatten());
 
@@ -105,15 +118,16 @@ pub async fn try_run(
     final_messages.push(ChatMessage {
         role: "user".to_owned(),
         content: Value::String(format!(
-            "The browser actions already ran successfully on the user's computer through Playwright. Do not say that browsing is unavailable.\n\nOriginal request:\n{user_text}\n\nOpened URL:\n{url}\n\nBrowser open result:\n{}\n\nCurrent page snapshot:\n{}\n\nScreenshot result:\n{}\n\nRegistered in-app screenshot preview:\n{}\n\nAnswer the user's request now using this browser evidence. Be concise but specific. If a registered screenshot filename is present, render that exact filename as inline code and tell the user they can click it inside HAWK Code to preview the image.",
+            "The browser actions already ran successfully on the user's computer through Playwright. Do not say that browsing is unavailable.\n\nOriginal request:\n{user_text}\n\nOpened URL:\n{url}\n\nBrowser open result:\n{}\n\nCurrent page snapshot:\n{}\n\nScreenshot result:\n{}\n\nRegistered in-app screenshot preview:\n{}\n\nAnswer the user's request now using this browser evidence. Be concise but specific. The HAWK interface will append its own clickable screenshot preview control after your answer, so do not invent a file link or claim the preview is unavailable.",
             truncate(&open_output, 2_000),
             truncate(&snapshot_output, 30_000),
             screenshot_output
                 .as_deref()
                 .map(|value| truncate(value, 4_000))
                 .unwrap_or_else(|| "No screenshot was requested.".to_owned()),
-            generated_screenshot_name
-                .as_deref()
+            generated_screenshot
+                .as_ref()
+                .map(|item| item.name.as_str())
                 .unwrap_or("No preview was registered.")
         )),
     });
@@ -122,13 +136,28 @@ pub async fn try_run(
         app,
         runtime,
         ChatPayload {
-            request_id,
+            request_id: request_id.clone(),
             config,
             messages: final_messages,
         },
         cancellation,
     )
     .await?;
+
+    if let Some(screenshot) = generated_screenshot {
+        let encoded_path = URL_SAFE_NO_PAD.encode(screenshot.path.as_bytes());
+        app.emit(
+            "qwen://delta",
+            DeltaEvent {
+                request_id,
+                delta: format!(
+                    "\n\n[📷 {}](#hawk-attachment-{encoded_path})",
+                    screenshot.name
+                ),
+            },
+        )
+        .map_err(|_| "Unable to append the screenshot preview control.".to_owned())?;
+    }
 
     Ok(FastPathOutcome::Handled(result))
 }
@@ -176,7 +205,7 @@ fn emit_generated_screenshot(
     app: &AppHandle,
     root: &Path,
     output: &str,
-) -> Result<Option<String>, String> {
+) -> Result<Option<GeneratedScreenshot>, String> {
     let Some(path) = screenshot_path_from_output(root, output) else {
         return Ok(None);
     };
@@ -186,12 +215,15 @@ fn emit_generated_screenshot(
     let Some(attachment) = prepared.pop() else {
         return Ok(None);
     };
-    let name = attachment.name.clone();
+    let generated = GeneratedScreenshot {
+        name: attachment.name.clone(),
+        path: attachment.path.clone(),
+    };
     let payload = serde_json::to_value(&attachment)
         .map_err(|_| "Unable to serialize the generated screenshot preview.".to_owned())?;
     app.emit("attachment://generated", payload)
         .map_err(|_| "Unable to deliver the generated screenshot to the interface.".to_owned())?;
-    Ok(Some(name))
+    Ok(Some(generated))
 }
 
 fn screenshot_path_from_output(root: &Path, output: &str) -> Option<PathBuf> {
@@ -203,11 +235,17 @@ fn screenshot_path_from_output(root: &Path, output: &str) -> Option<PathBuf> {
         let end = png_end + 4;
         let start = lower
             .find("playwright-cli")
-            .or_else(|| lower[..png_end].rfind(|character: char| character.is_whitespace()).map(|index| index + 1))
+            .or_else(|| {
+                lower[..png_end]
+                    .rfind(|character: char| character.is_whitespace())
+                    .map(|index| index + 1)
+            })
             .unwrap_or(0);
         let raw = line[start..end]
             .trim()
-            .trim_matches(|character: char| matches!(character, '`' | '"' | '\'' | '(' | ')' | '[' | ']'));
+            .trim_matches(|character: char| {
+                matches!(character, '`' | '"' | '\'' | '(' | ')' | '[' | ']')
+            });
         if raw.is_empty() {
             continue;
         }
@@ -218,7 +256,11 @@ fn screenshot_path_from_output(root: &Path, output: &str) -> Option<PathBuf> {
             root.join(candidate)
         };
         if let Ok(canonical) = candidate.canonicalize() {
-            if canonical.is_file() && canonical.extension().is_some_and(|ext| ext.eq_ignore_ascii_case("png")) {
+            if canonical.is_file()
+                && canonical
+                    .extension()
+                    .is_some_and(|ext| ext.eq_ignore_ascii_case("png"))
+            {
                 return Some(canonical);
             }
         }
