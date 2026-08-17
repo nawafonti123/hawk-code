@@ -34,6 +34,7 @@ fn file_kind(extension: &str) -> Option<(&'static str, &'static str)> {
         "webp" => Some(("image", "image/webp")),
         "gif" => Some(("image", "image/gif")),
         "bmp" => Some(("image", "image/bmp")),
+        "pdf" => Some(("pdf", "application/pdf")),
         "svg" => Some(("text", "image/svg+xml")),
         "txt" | "md" | "mdx" | "log" => Some(("text", "text/plain")),
         "json" => Some(("text", "application/json")),
@@ -77,15 +78,16 @@ pub fn prepare(payload: AttachmentPayload) -> Result<Vec<PreparedAttachment>, St
             .and_then(|value| value.to_str())
             .unwrap_or_default()
             .to_ascii_lowercase();
-        let (kind, mime_type) =
-            file_kind(&extension).ok_or_else(|| {
-                format!(
-                "{} is not supported yet. Choose an image, source file, or plain-text document.",
-                path.file_name().and_then(|value| value.to_str()).unwrap_or("The file")
+        let (kind, mime_type) = file_kind(&extension).ok_or_else(|| {
+            format!(
+                "{} is not supported yet. Choose an image, PDF, source file, or plain-text document.",
+                path.file_name()
+                    .and_then(|value| value.to_str())
+                    .unwrap_or("The file")
             )
-            })?;
+        })?;
         let bytes = fs::read(&path).map_err(|_| "An attachment could not be read.".to_owned())?;
-        let (text_content, data_url) = if kind == "image" {
+        let (text_content, data_url) = if matches!(kind, "image" | "pdf") {
             (
                 None,
                 Some(format!(
@@ -127,9 +129,10 @@ mod tests {
     }
 
     #[test]
-    fn recognizes_visual_and_text_inputs() {
+    fn recognizes_visual_text_and_pdf_inputs() {
         assert_eq!(file_kind("png"), Some(("image", "image/png")));
         assert_eq!(file_kind("rs"), Some(("text", "text/plain")));
+        assert_eq!(file_kind("pdf"), Some(("pdf", "application/pdf")));
     }
 
     #[test]
