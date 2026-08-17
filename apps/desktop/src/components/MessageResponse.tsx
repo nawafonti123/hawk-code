@@ -1,4 +1,4 @@
-import { Check, Copy, Pencil, Save, X } from "lucide-react";
+import { Check, Copy, ImageIcon, Pencil, Save, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown, { type Components } from "react-markdown";
@@ -24,31 +24,59 @@ function markdownComponents(
   onPromptSave?: (previous: string, next: string) => void,
 ): Components {
   return {
-  pre: ({ children }) => <>{children}</>,
-  code: ({ className, children, ...props }) => {
-    const value = textFromChildren(children).replace(/\n$/u, "");
-    const language = /language-([\w-]+)/u.exec(className ?? "")?.[1];
-    const block = Boolean(language) || value.includes("\n");
-    if (language === "prompt")
-      return onPromptSave ? (
-        <PromptBlock key={value} prompt={value} onSave={onPromptSave} />
+    pre: ({ children }) => <>{children}</>,
+    code: ({ className, children, ...props }) => {
+      const value = textFromChildren(children).replace(/\n$/u, "");
+      const language = /language-([\w-]+)/u.exec(className ?? "")?.[1];
+      const block = Boolean(language) || value.includes("\n");
+      if (language === "prompt")
+        return onPromptSave ? (
+          <PromptBlock key={value} prompt={value} onSave={onPromptSave} />
+        ) : (
+          <PromptBlock key={value} prompt={value} />
+        );
+      if (!block) {
+        const generatedImage = generatedImageName(value);
+        if (generatedImage) {
+          return (
+            <button
+              type="button"
+              className="generated-attachment-link"
+              data-hawk-generated-attachment={generatedImage}
+              title="فتح الصورة داخل HAWK Code"
+            >
+              <ImageIcon size={13} aria-hidden="true" />
+              <code className={className} {...props}>
+                {children}
+              </code>
+            </button>
+          );
+        }
+      }
+      return block ? (
+        <CodeBlock code={value} language={language ?? "text"} />
       ) : (
-        <PromptBlock key={value} prompt={value} />
+        <code className={className} {...props}>
+          {children}
+        </code>
       );
-    return block ? (
-      <CodeBlock code={value} language={language ?? "text"} />
-    ) : (
-      <code className={className} {...props}>
+    },
+    a: ({ href, children }) => (
+      <a href={href} target="_blank" rel="noreferrer">
         {children}
-      </code>
-    );
-  },
-  a: ({ href, children }) => (
-    <a href={href} target="_blank" rel="noreferrer">
-      {children}
-    </a>
-  ),
-};
+      </a>
+    ),
+  };
+}
+
+function generatedImageName(value: string): string | null {
+  const normalized = value.trim().replace(/\\/gu, "/");
+  const filename = normalized.split("/").pop()?.trim() ?? "";
+  if (!/^playwright-cli.*\.(?:png|jpe?g|webp)$/iu.test(normalized) &&
+      !/^page-.*\.(?:png|jpe?g|webp)$/iu.test(filename)) {
+    return null;
+  }
+  return filename || null;
 }
 
 function textFromChildren(children: React.ReactNode): string {
