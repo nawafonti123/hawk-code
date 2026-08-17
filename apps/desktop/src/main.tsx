@@ -6,6 +6,7 @@ import "@fontsource-variable/noto-sans-arabic";
 import "@fontsource-variable/jetbrains-mono";
 import "@hawk-code/design-system/tokens.css";
 import "./i18n";
+import "./i18n-extensions";
 import "./styles.css";
 import "./sidebar-premium.css";
 import "./chat-premium.css";
