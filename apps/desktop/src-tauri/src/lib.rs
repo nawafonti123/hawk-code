@@ -2,6 +2,7 @@ mod agent;
 mod attachments;
 mod auth;
 mod browser_automation;
+mod browser_fast_path;
 mod mcp;
 mod oauth;
 mod project;
@@ -169,7 +170,19 @@ async fn qwen_agent(
 ) -> Result<ChatResult, String> {
     validate_envelope(&request).map_err(|error| error.to_string())?;
     let cancellation = runtime.replace_cancellation();
-    agent::run(&app, &runtime, request.payload, cancellation).await
+    match browser_fast_path::try_run(
+        &app,
+        &runtime,
+        request.payload,
+        cancellation.clone(),
+    )
+    .await?
+    {
+        browser_fast_path::FastPathOutcome::Handled(result) => Ok(result),
+        browser_fast_path::FastPathOutcome::Continue(payload) => {
+            agent::run(&app, &runtime, payload, cancellation).await
+        }
+    }
 }
 
 #[tauri::command]
