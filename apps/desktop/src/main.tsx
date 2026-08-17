@@ -8,6 +8,7 @@ import "@hawk-code/design-system/tokens.css";
 import "./i18n";
 import "./styles.css";
 import "./sidebar-premium.css";
+import "./chat-premium.css";
 import { App } from "./App";
 
 const queryClient = new QueryClient({
