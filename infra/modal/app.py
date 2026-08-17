@@ -37,6 +37,11 @@ WARM_IDLE_SECONDS = int(os.getenv("HAWK_WARM_IDLE_SECONDS", "180"))
 PROMPT_BATCH = int(os.getenv("HAWK_PROMPT_BATCH", "1024"))
 PROMPT_UBATCH = int(os.getenv("HAWK_PROMPT_UBATCH", "512"))
 PROMPT_CACHE_BYTES = int(os.getenv("HAWK_PROMPT_CACHE_BYTES", str(2 << 30)))
+# Tool-selection turns should be tiny. Letting an agent round inherit the
+# normal 16K output budget can keep a Modal Web Function busy long enough to
+# hit its HTTP request timeout before HAWK receives the tool call.
+AGENT_ROUTE_MAX_TOKENS = int(os.getenv("HAWK_AGENT_ROUTE_MAX_TOKENS", "768"))
+AGENT_FOLLOWUP_MAX_TOKENS = int(os.getenv("HAWK_AGENT_FOLLOWUP_MAX_TOKENS", "2048"))
 VISION_PROMPT = "Describe this image in detail for an AI coding assistant. Include: what the image shows (UI, diagram, error, code screenshot, etc.), any visible text/code, layout, colors, and any issues or elements the user might want to discuss. Be thorough but concise."
 
 app = modal.App(APP_NAME)
@@ -158,6 +163,38 @@ def _analyze_images_in_messages(
     return result
 
 
+def _prepare_agent_messages(
+    messages: list[dict[str, Any]], tools: Any
+) -> list[dict[str, Any]]:
+    if not tools:
+        return messages
+    router_instruction = {
+        "role": "system",
+        "content": (
+            "HAWK desktop tools are real and available on the user's computer. "
+            "When the user asks for an action that matches an available tool, call the tool immediately. "
+            "Do not claim that browsing, file access, project inspection, or other listed capabilities are unavailable. "
+            "Before a tool call, do not write explanatory prose. After tool results, either call the next required tool or answer concisely."
+        ),
+    }
+    # Preserve the user's primary system prompt as the first message, then add
+    # this short operational rule so the model sees tool availability clearly.
+    if messages and messages[0].get("role") == "system":
+        return [messages[0], router_instruction, *messages[1:]]
+    return [router_instruction, *messages]
+
+
+def _request_max_tokens(request: dict[str, Any], messages: list[dict[str, Any]]) -> int:
+    requested = min(int(request.get("max_tokens", 16_384)), 16_384)
+    if not request.get("tools"):
+        return requested
+    # Initial tool routing needs only a small JSON call. After a tool result,
+    # allow more room for either the next call or the final user-facing answer.
+    last_role = messages[-1].get("role") if messages else None
+    cap = AGENT_FOLLOWUP_MAX_TOKENS if last_role == "tool" else AGENT_ROUTE_MAX_TOKENS
+    return min(requested, cap)
+
+
 @app.cls(
     image=image,
     gpu="L4",
@@ -211,9 +248,11 @@ class HAWKModel:
         @api.post("/v1/chat/completions")
         async def completions(request: Request) -> Any:
             request = await request.json()
+            tools = request.get("tools")
             messages = _analyze_images_in_messages(request.get("messages", []))
+            messages = _prepare_agent_messages(messages, tools)
             stream = bool(request.get("stream", False))
-            max_tokens = min(int(request.get("max_tokens", 16_384)), 16_384)
+            max_tokens = _request_max_tokens(request, messages)
             started = time.time()
 
             def chunks():
@@ -222,7 +261,7 @@ class HAWKModel:
                     max_tokens=max_tokens,
                     temperature=float(request.get("temperature", 0.2)),
                     stream=True,
-                    tools=request.get("tools"),
+                    tools=tools,
                     tool_choice=request.get("tool_choice", "auto"),
                 ):
                     yield f"data: {__import__('json').dumps(chunk)}\n\n"
@@ -236,7 +275,7 @@ class HAWKModel:
                 max_tokens=max_tokens,
                 temperature=float(request.get("temperature", 0.2)),
                 stream=False,
-                tools=request.get("tools"),
+                tools=tools,
                 tool_choice=request.get("tool_choice", "auto"),
             )
             result.setdefault("model", MODEL_ID)
@@ -268,9 +307,11 @@ class HAWKModel:
         if not isinstance(request, Request):
             raise TypeError("Modal did not provide a FastAPI request")
         request = await request.json()
+        tools = request.get("tools")
         messages = _analyze_images_in_messages(request.get("messages", []))
+        messages = _prepare_agent_messages(messages, tools)
         stream = bool(request.get("stream", False))
-        max_tokens = min(int(request.get("max_tokens", 16_384)), 16_384)
+        max_tokens = _request_max_tokens(request, messages)
         started = time.time()
 
         def chunks():
@@ -279,7 +320,7 @@ class HAWKModel:
                 max_tokens=max_tokens,
                 temperature=float(request.get("temperature", 0.2)),
                 stream=True,
-                tools=request.get("tools"),
+                tools=tools,
                 tool_choice=request.get("tool_choice", "auto"),
             ):
                 yield f"data: {__import__('json').dumps(chunk)}\n\n"
@@ -293,7 +334,7 @@ class HAWKModel:
             max_tokens=max_tokens,
             temperature=float(request.get("temperature", 0.2)),
             stream=False,
-            tools=request.get("tools"),
+            tools=tools,
             tool_choice=request.get("tool_choice", "auto"),
         )
         result.setdefault("model", MODEL_ID)
