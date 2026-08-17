@@ -30,28 +30,17 @@ pub async fn run(
     first
 }
 
-pub fn is_interactive_action(action: &str) -> bool {
-    matches!(
-        action,
-        "open"
-            | "goto"
-            | "click"
-            | "fill"
-            | "type"
-            | "press"
-            | "back"
-            | "forward"
-            | "reload"
-            | "close"
-    )
-}
-
 fn command_args(action: &str, args: &Value) -> Result<Vec<String>, String> {
     let mut command = Vec::new();
     match action {
         "open" => {
             let url = safe_url(required(args, "url")?)?;
-            command.extend(["open".to_owned(), url, "--headed".to_owned(), "--persistent".to_owned()]);
+            command.extend([
+                "open".to_owned(),
+                url,
+                "--headed".to_owned(),
+                "--persistent".to_owned(),
+            ]);
         }
         "goto" => {
             let url = safe_url(required(args, "url")?)?;
@@ -108,8 +97,7 @@ async fn execute(
     let npx = if cfg!(windows) { "npx.cmd" } else { "npx" };
     let mut command = Command::new(npx);
     command
-        .arg("-y")
-        .arg("@playwright/cli@latest")
+        .args(["--yes", "--package", "@playwright/cli@latest", "playwright-cli"])
         .args(cli_args)
         .current_dir(root)
         .kill_on_drop(true);
@@ -138,9 +126,14 @@ async fn install_browser(
     let npx = if cfg!(windows) { "npx.cmd" } else { "npx" };
     let mut command = Command::new(npx);
     command
-        .arg("-y")
-        .arg("@playwright/cli@latest")
-        .args(["install-browser", "chromium"])
+        .args([
+            "--yes",
+            "--package",
+            "@playwright/cli@latest",
+            "playwright-cli",
+            "install-browser",
+            "chromium",
+        ])
         .current_dir(root)
         .kill_on_drop(true);
     let output = tokio::select! {
@@ -188,5 +181,26 @@ fn truncate(value: &str) -> String {
             "{}\n... browser output truncated by HAWK Code ...",
             value.chars().take(MAX_BROWSER_OUTPUT).collect::<String>()
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rejects_non_web_urls() {
+        assert!(safe_url("file:///C:/Windows/win.ini").is_err());
+        assert!(safe_url("javascript:alert(1)").is_err());
+        assert!(safe_url("https://example.com").is_ok());
+    }
+
+    #[test]
+    fn maps_browser_actions_to_playwright_commands() {
+        let args = serde_json::json!({"action": "fill", "target": "e5", "value": "hello"});
+        assert_eq!(
+            command_args("fill", &args).expect("fill should be valid"),
+            vec!["fill", "e5", "hello"]
+        );
     }
 }
