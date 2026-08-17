@@ -27,7 +27,7 @@ pub struct AgentPayload {
     pub request_id: String,
     pub config: ProviderConfig,
     pub messages: Vec<ChatMessage>,
-    pub workspace_path: String,
+    pub workspace_path: Option<String>,
     pub permission_profile: String,
 }
 
@@ -58,7 +58,7 @@ pub async fn run(
     if payload.messages.is_empty() || payload.messages.len() > 100 {
         return Err("The agent conversation must contain between 1 and 100 messages.".to_owned());
     }
-    let root = canonical_workspace(&payload.workspace_path)?;
+    let root = canonical_workspace(payload.workspace_path.as_deref().unwrap_or_default())?;
     let mut graph = project_graph::sync(app, &root)?;
     let endpoint = validate_config(&payload.config)?;
     let (api_key, _) = resolve_api_key()?;
@@ -493,6 +493,14 @@ async fn execute_tool(
 }
 
 fn canonical_workspace(path: &str) -> Result<PathBuf, String> {
+    if path.trim().is_empty() {
+        let root = std::env::temp_dir().join("hawk-code-general-agent");
+        fs::create_dir_all(&root)
+            .map_err(|_| "HAWK could not create its general-agent workspace.".to_owned())?;
+        return root
+            .canonicalize()
+            .map_err(|_| "HAWK could not resolve its general-agent workspace.".to_owned());
+    }
     let root = PathBuf::from(path.trim());
     if !root.is_dir() {
         return Err("The active workspace is unavailable.".to_owned());
@@ -1012,6 +1020,13 @@ mod tests {
         let root = std::env::temp_dir();
         assert!(safe_path(&root, "../secret.txt", true).is_err());
         assert!(safe_path(&root, "C:\\Windows\\win.ini", false).is_err());
+    }
+
+    #[test]
+    fn creates_an_isolated_general_agent_workspace() {
+        let root = canonical_workspace("").expect("general agent root should be available");
+        assert!(root.is_dir());
+        assert!(root.ends_with("hawk-code-general-agent"));
     }
 
     #[test]
