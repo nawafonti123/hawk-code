@@ -92,8 +92,16 @@ export function AttachmentPreviewHost() {
         <div className="attachment-preview__content">
           {preview.kind === "image" && preview.dataUrl ? (
             <img src={preview.dataUrl} alt={preview.name} />
+          ) : preview.kind === "pdf" && preview.dataUrl ? (
+            <iframe
+              className="attachment-preview__pdf"
+              src={preview.dataUrl}
+              title={preview.name}
+            />
           ) : preview.kind === "text" ? (
-            <pre dir="auto">{preview.textContent ?? "This file has no previewable text."}</pre>
+            <pre dir="auto">
+              {preview.textContent ?? "This file has no previewable text."}
+            </pre>
           ) : (
             <div className="attachment-preview__empty">
               This attachment type does not have an internal renderer yet.
