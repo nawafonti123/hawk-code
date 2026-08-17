@@ -9,6 +9,7 @@ import "./i18n";
 import "./styles.css";
 import "./sidebar-premium.css";
 import "./chat-premium.css";
+import "./chat-final-polish.css";
 import { App } from "./App";
 
 const queryClient = new QueryClient({
