@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  web-quality:
+  quality:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,8 +16,13 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+      - run: cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml
