@@ -1,6 +1,7 @@
 mod agent;
 mod attachments;
 mod auth;
+mod browser_automation;
 mod mcp;
 mod oauth;
 mod project;
