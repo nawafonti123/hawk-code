@@ -1,0 +1,8 @@
+{
+  "name": "hawk-agent-verification",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "HAWK Browser Bridge",
+  "version": "0.1.0",
+  "description": "User-approved capture and interaction bridge for HAWK Code.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {
+    "default_title": "HAWK Browser Bridge",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

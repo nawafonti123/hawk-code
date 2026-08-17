@@ -1,0 +1,92 @@
+- generic [ref=f3e3]:
+  - complementary [ref=f3e4]:
+    - generic "HAWK Code" [ref=f3e6]:
+      - generic [ref=f3e8]:
+        - strong [ref=f3e9]: HAWK
+        - generic [ref=f3e10]: Code
+    - button "مهمة جديدة" [ref=f3e11] [cursor=pointer]
+    - button "بحث أو أمر Ctrl K" [ref=f3e14] [cursor=pointer]:
+      - generic [ref=f3e18]: بحث أو أمر
+      - generic [ref=f3e19]: Ctrl K
+    - navigation "التنقل الرئيسي" [ref=f3e20]:
+      - button "المهام" [ref=f3e21] [cursor=pointer]
+      - button "مساحات العمل" [ref=f3e26] [cursor=pointer]
+      - button "تغييرات Git" [ref=f3e30] [cursor=pointer]
+      - button "الوكلاء" [ref=f3e36] [cursor=pointer]
+      - button "المهارات" [ref=f3e41] [cursor=pointer]
+      - button "خوادم MCP" [ref=f3e46] [cursor=pointer]
+      - button "المتصفح" [ref=f3e54] [cursor=pointer]
+    - generic [ref=f3e61]:
+      - generic [ref=f3e62]:
+        - generic [ref=f3e63]: المشاريع
+        - button "إضافة أو فتح مشروع" [ref=f3e64] [cursor=pointer]
+      - button "دردشة عامة محادثة خارج أي مشروع" [ref=f3e66] [cursor=pointer]:
+        - generic [ref=f3e69]: دردشة عامة
+        - generic [ref=f3e70]: محادثة خارج أي مشروع
+      - generic [ref=f3e71]:
+        - generic [ref=f3e72]: المحادثات
+        - button "دردشة جديدة" [ref=f3e73] [cursor=pointer]
+      - generic [ref=f3e76]:
+        - button "General chat لا توجد رسائل بعد" [ref=f3e77] [cursor=pointer]:
+          - generic [ref=f3e78]: General chat
+          - generic [ref=f3e79]: لا توجد رسائل بعد
+        - button "تغيير اسم الدردشة" [ref=f3e80] [cursor=pointer]: •••
+        - button "حذف الدردشة" [ref=f3e81] [cursor=pointer]
+    - generic [ref=f3e85]:
+      - button "الإعدادات" [ref=f3e86] [cursor=pointer]
+      - button "قائمة الحساب" [ref=f3e92] [cursor=pointer]:
+        - generic [ref=f3e93]: LU
+        - generic [ref=f3e95]:
+          - strong [ref=f3e96]: Local user
+          - generic [ref=f3e97]: حساب محلي
+  - generic [ref=f3e100]:
+    - banner [ref=f3e101]:
+      - generic [ref=f3e102]:
+        - button "إظهار أو إخفاء الشريط الجانبي" [ref=f3e103] [cursor=pointer]
+        - generic [ref=f3e106]:
+          - strong [ref=f3e107]: الرئيسية
+          - generic [ref=f3e108]: جاهز
+      - generic [ref=f3e109]:
+        - generic [ref=f3e110]: qwen3.7-max
+        - generic [ref=f3e111]: 0 رمز
+        - generic [ref=f3e112]: وافق على الإجراءات الآمنة
+        - button "لوحة الأوامر" [ref=f3e115] [cursor=pointer]:
+          - generic [ref=f3e118]: Ctrl K
+        - button "لغة الواجهة" [ref=f3e120] [cursor=pointer]
+    - generic [ref=f3e125]:
+      - main [ref=f3e126]:
+        - generic [ref=f3e127]:
+          - generic [ref=f3e128]:
+            - heading "ماذا تريد أن تنجز؟" [level=1] [ref=f3e130]
+            - paragraph [ref=f3e131]: افتح مشروعًا محليًا، ثم صف المهمة بطريقتك. يستخدم HAWK نموذج Qwen مع بث مباشر وقياس للرموز.
+          - button "فتح مشروع محلي" [ref=f3e132] [cursor=pointer]
+          - region "اقتراحات للبدء" [ref=f3e139]:
+            - button "مراجعة مشروع جهّز طلبًا لتحليل البنية والمشكلات" [ref=f3e140] [cursor=pointer]:
+              - generic [ref=f3e146]:
+                - strong [ref=f3e147]: مراجعة مشروع
+                - generic [ref=f3e148]: جهّز طلبًا لتحليل البنية والمشكلات
+            - button "إصلاح مشكلة جهّز طلب تشخيص وإصلاح" [ref=f3e149] [cursor=pointer]:
+              - generic [ref=f3e153]:
+                - strong [ref=f3e154]: إصلاح مشكلة
+                - generic [ref=f3e155]: جهّز طلب تشخيص وإصلاح
+            - button "إعداد Qwen افحص المفتاح والنموذج والاتصال" [ref=f3e156] [cursor=pointer]:
+              - generic [ref=f3e160]:
+                - strong [ref=f3e161]: إعداد Qwen
+                - generic [ref=f3e162]: افحص المفتاح والنموذج والاتصال
+      - generic [ref=f3e163]:
+        - generic [ref=f3e164]:
+          - textbox "اكتب مهمة إلى HAWK…" [ref=f3e165]
+          - generic [ref=f3e166]:
+            - generic [ref=f3e167]:
+              - button "إضافة" [ref=f3e169] [cursor=pointer]
+              - button "خطط أولًا واطرح أسئلة مركزة" [pressed] [ref=f3e171] [cursor=pointer]:
+                - generic [ref=f3e175]: خطط أولًا
+              - button "بدء الإدخال الصوتي" [ref=f3e176] [cursor=pointer]
+              - button "اختيار النموذج" [ref=f3e181] [cursor=pointer]: qwen3.7-max
+              - button "وضع التفكير" [ref=f3e185] [cursor=pointer]:
+                - generic [ref=f3e186]: "تفكير: متوازن"
+              - button "قوة النموذج" [ref=f3e190] [cursor=pointer]:
+                - generic [ref=f3e191]: "القوة: جودة"
+              - button "اختيار الصلاحيات" [ref=f3e195] [cursor=pointer]: وافق على الإجراءات الآمنة
+            - button "إرسال" [disabled] [ref=f3e198]
+        - generic [ref=f3e201]: Enter للإرسال · Shift+Enter لسطر جديد

@@ -1,0 +1,32 @@
+- main [ref=f1e3]:
+  - region [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - generic "HAWK Code" [ref=f1e6]:
+        - generic [ref=f1e8]:
+          - strong [ref=f1e9]: HAWK
+          - generic [ref=f1e10]: Code
+      - generic [ref=f1e11]: محمي محليًا
+    - generic [ref=f1e15]:
+      - text: HAWK STUDIO / SECURE ACCESS
+      - heading "مرحبًا بعودتك" [level=1] [ref=f1e16]
+      - paragraph [ref=f1e17]: سجّل الدخول قبل فتح مساحة العمل الهندسية.
+    - generic "مزودو تسجيل الدخول الاجتماعي" [ref=f1e18]:
+      - button "تسجيل الدخول باستخدام Google" [disabled] [ref=f1e19]:
+        - generic [ref=f1e27]: قريبًا بعد اعتماد المزوّد
+      - button "تسجيل الدخول باستخدام GitHub" [disabled] [ref=f1e28]:
+        - generic [ref=f1e33]: قريبًا بعد اعتماد المزوّد
+      - button "تسجيل الدخول باستخدام Facebook" [disabled] [ref=f1e34]:
+        - generic [ref=f1e40]: قريبًا بعد اعتماد المزوّد
+    - generic [ref=f1e41]: أو استخدم حسابًا محليًا محميًا
+    - tablist [ref=f1e43]:
+      - tab "تسجيل الدخول" [selected] [ref=f1e44] [cursor=pointer]
+      - tab "إنشاء حساب" [ref=f1e45] [cursor=pointer]
+    - generic [ref=f1e46]:
+      - generic [ref=f1e47]:
+        - generic [ref=f1e48]: البريد الإلكتروني
+        - textbox "البريد الإلكتروني" [ref=f1e53]
+      - generic [ref=f1e54]:
+        - generic [ref=f1e55]: كلمة المرور
+        - textbox "كلمة المرور" [ref=f1e61]
+      - button "تسجيل الدخول" [disabled] [ref=f1e62]
+    - paragraph [ref=f1e66]: لا تُحفظ كلمة المرور مباشرة. يشتق HAWK مدقق Argon2id ويحفظه داخل Windows Credential Manager؛ خمس محاولات فاشلة تؤدي إلى قفل مؤقت.

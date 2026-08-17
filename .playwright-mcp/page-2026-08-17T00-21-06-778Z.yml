@@ -1,0 +1,459 @@
+- generic [ref=f1e3]:
+  - complementary [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - generic "HAWK Code" [ref=f1e7]:
+        - generic [ref=f1e9]:
+          - strong [ref=f1e10]: HAWK
+          - generic [ref=f1e11]: Code
+      - button "مهمة جديدة" [ref=f1e12] [cursor=pointer]
+      - button "بحث أو أمر Ctrl K" [ref=f1e15] [cursor=pointer]:
+        - generic [ref=f1e19]: بحث أو أمر
+        - generic [ref=f1e20]: Ctrl K
+      - navigation "التنقل الرئيسي" [ref=f1e21]:
+        - button "المهام" [ref=f1e22] [cursor=pointer]
+        - button "مساحات العمل" [ref=f1e27] [cursor=pointer]
+        - button "تغييرات Git" [ref=f1e31] [cursor=pointer]
+        - button "الوكلاء" [ref=f1e37] [cursor=pointer]
+        - button "المهارات" [ref=f1e42] [cursor=pointer]
+        - button "خوادم MCP" [ref=f1e47] [cursor=pointer]
+        - button "المتصفح" [ref=f1e55] [cursor=pointer]
+      - generic [ref=f1e62]:
+        - generic [ref=f1e63]:
+          - generic [ref=f1e64]: المشاريع
+          - button "إضافة أو فتح مشروع" [ref=f1e65] [cursor=pointer]
+        - button "دردشة عامة محادثة خارج أي مشروع" [ref=f1e67] [cursor=pointer]:
+          - generic [ref=f1e68]: دردشة عامة
+          - generic [ref=f1e72]: محادثة خارج أي مشروع
+        - generic [ref=f1e73]:
+          - generic [ref=f1e74]: المحادثات
+          - button "دردشة جديدة" [ref=f1e75] [cursor=pointer]
+        - generic [ref=f1e77]:
+          - generic [ref=f1e365]:
+            - button "مشروع مع اسم طويل جداً جداً يتجاوز عرض الشريط الجانبي بالكامل لاختبار القطع لا توجد رسائل بعد" [ref=f1e366] [cursor=pointer]:
+              - generic [ref=f1e370]:
+                - strong [ref=f1e371]: مشروع مع اسم طويل جداً جداً يتجاوز عرض الشريط الجانبي بالكامل لاختبار القطع
+                - generic [ref=f1e372]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e373] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e374] [cursor=pointer]
+          - generic [ref=f1e378]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e379] [cursor=pointer]:
+              - generic [ref=f1e383]:
+                - strong [ref=f1e384]: New chat
+                - generic [ref=f1e385]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e386] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e387] [cursor=pointer]
+          - generic [ref=f1e391]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e392] [cursor=pointer]:
+              - generic [ref=f1e396]:
+                - strong [ref=f1e397]: New chat
+                - generic [ref=f1e398]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e399] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e400] [cursor=pointer]
+          - generic [ref=f1e404]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e405] [cursor=pointer]:
+              - generic [ref=f1e409]:
+                - strong [ref=f1e410]: New chat
+                - generic [ref=f1e411]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e412] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e413] [cursor=pointer]
+          - generic [ref=f1e417]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e418] [cursor=pointer]:
+              - generic [ref=f1e422]:
+                - strong [ref=f1e423]: New chat
+                - generic [ref=f1e424]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e425] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e426] [cursor=pointer]
+          - generic [ref=f1e430]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e431] [cursor=pointer]:
+              - generic [ref=f1e435]:
+                - strong [ref=f1e436]: New chat
+                - generic [ref=f1e437]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e438] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e439] [cursor=pointer]
+          - generic [ref=f1e443]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e444] [cursor=pointer]:
+              - generic [ref=f1e448]:
+                - strong [ref=f1e449]: New chat
+                - generic [ref=f1e450]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e451] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e452] [cursor=pointer]
+          - generic [ref=f1e456]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e457] [cursor=pointer]:
+              - generic [ref=f1e461]:
+                - strong [ref=f1e462]: New chat
+                - generic [ref=f1e463]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e464] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e465] [cursor=pointer]
+          - generic [ref=f1e469]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e470] [cursor=pointer]:
+              - generic [ref=f1e474]:
+                - strong [ref=f1e475]: New chat
+                - generic [ref=f1e476]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e477] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e478] [cursor=pointer]
+          - generic [ref=f1e482]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e483] [cursor=pointer]:
+              - generic [ref=f1e487]:
+                - strong [ref=f1e488]: New chat
+                - generic [ref=f1e489]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e490] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e491] [cursor=pointer]
+          - generic [ref=f1e495]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e496] [cursor=pointer]:
+              - generic [ref=f1e500]:
+                - strong [ref=f1e501]: New chat
+                - generic [ref=f1e502]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e503] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e504] [cursor=pointer]
+          - generic [ref=f1e508]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e509] [cursor=pointer]:
+              - generic [ref=f1e513]:
+                - strong [ref=f1e514]: New chat
+                - generic [ref=f1e515]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e516] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e517] [cursor=pointer]
+          - generic [ref=f1e521]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e522] [cursor=pointer]:
+              - generic [ref=f1e526]:
+                - strong [ref=f1e527]: New chat
+                - generic [ref=f1e528]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e529] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e530] [cursor=pointer]
+          - generic [ref=f1e534]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e535] [cursor=pointer]:
+              - generic [ref=f1e539]:
+                - strong [ref=f1e540]: New chat
+                - generic [ref=f1e541]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e542] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e543] [cursor=pointer]
+          - generic [ref=f1e547]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e548] [cursor=pointer]:
+              - generic [ref=f1e552]:
+                - strong [ref=f1e553]: New chat
+                - generic [ref=f1e554]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e555] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e556] [cursor=pointer]
+          - generic [ref=f1e560]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e561] [cursor=pointer]:
+              - generic [ref=f1e565]:
+                - strong [ref=f1e566]: New chat
+                - generic [ref=f1e567]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e568] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e569] [cursor=pointer]
+          - generic [ref=f1e573]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e574] [cursor=pointer]:
+              - generic [ref=f1e578]:
+                - strong [ref=f1e579]: New chat
+                - generic [ref=f1e580]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e581] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e582] [cursor=pointer]
+          - generic [ref=f1e586]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e587] [cursor=pointer]:
+              - generic [ref=f1e591]:
+                - strong [ref=f1e592]: New chat
+                - generic [ref=f1e593]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e594] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e595] [cursor=pointer]
+          - generic [ref=f1e599]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e600] [cursor=pointer]:
+              - generic [ref=f1e604]:
+                - strong [ref=f1e605]: New chat
+                - generic [ref=f1e606]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e607] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e608] [cursor=pointer]
+          - generic [ref=f1e612]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e613] [cursor=pointer]:
+              - generic [ref=f1e617]:
+                - strong [ref=f1e618]: New chat
+                - generic [ref=f1e619]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e620] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e621] [cursor=pointer]
+          - generic [ref=f1e625]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e626] [cursor=pointer]:
+              - generic [ref=f1e630]:
+                - strong [ref=f1e631]: New chat
+                - generic [ref=f1e632]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e633] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e634] [cursor=pointer]
+          - generic [ref=f1e638]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e639] [cursor=pointer]:
+              - generic [ref=f1e643]:
+                - strong [ref=f1e644]: New chat
+                - generic [ref=f1e645]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e646] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e647] [cursor=pointer]
+          - generic [ref=f1e651]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e652] [cursor=pointer]:
+              - generic [ref=f1e656]:
+                - strong [ref=f1e657]: New chat
+                - generic [ref=f1e658]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e659] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e660] [cursor=pointer]
+          - generic [ref=f1e664]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e665] [cursor=pointer]:
+              - generic [ref=f1e669]:
+                - strong [ref=f1e670]: New chat
+                - generic [ref=f1e671]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e672] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e673] [cursor=pointer]
+          - generic [ref=f1e677]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e678] [cursor=pointer]:
+              - generic [ref=f1e682]:
+                - strong [ref=f1e683]: New chat
+                - generic [ref=f1e684]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e685] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e686] [cursor=pointer]
+          - generic [ref=f1e690]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e691] [cursor=pointer]:
+              - generic [ref=f1e695]:
+                - strong [ref=f1e696]: New chat
+                - generic [ref=f1e697]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e698] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e699] [cursor=pointer]
+          - generic [ref=f1e703]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e704] [cursor=pointer]:
+              - generic [ref=f1e708]:
+                - strong [ref=f1e709]: New chat
+                - generic [ref=f1e710]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e711] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e712] [cursor=pointer]
+          - generic [ref=f1e716]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e717] [cursor=pointer]:
+              - generic [ref=f1e721]:
+                - strong [ref=f1e722]: New chat
+                - generic [ref=f1e723]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e724] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e725] [cursor=pointer]
+          - generic [ref=f1e729]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e730] [cursor=pointer]:
+              - generic [ref=f1e734]:
+                - strong [ref=f1e735]: New chat
+                - generic [ref=f1e736]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e737] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e738] [cursor=pointer]
+          - generic [ref=f1e742]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e743] [cursor=pointer]:
+              - generic [ref=f1e747]:
+                - strong [ref=f1e748]: New chat
+                - generic [ref=f1e749]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e750] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e751] [cursor=pointer]
+          - generic [ref=f1e755]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e756] [cursor=pointer]:
+              - generic [ref=f1e760]:
+                - strong [ref=f1e761]: New chat
+                - generic [ref=f1e762]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e763] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e764] [cursor=pointer]
+          - generic [ref=f1e768]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e769] [cursor=pointer]:
+              - generic [ref=f1e773]:
+                - strong [ref=f1e774]: New chat
+                - generic [ref=f1e775]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e776] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e777] [cursor=pointer]
+          - generic [ref=f1e781]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e782] [cursor=pointer]:
+              - generic [ref=f1e786]:
+                - strong [ref=f1e787]: New chat
+                - generic [ref=f1e788]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e789] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e790] [cursor=pointer]
+          - generic [ref=f1e794]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e795] [cursor=pointer]:
+              - generic [ref=f1e799]:
+                - strong [ref=f1e800]: New chat
+                - generic [ref=f1e801]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e802] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e803] [cursor=pointer]
+          - generic [ref=f1e807]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e808] [cursor=pointer]:
+              - generic [ref=f1e812]:
+                - strong [ref=f1e813]: New chat
+                - generic [ref=f1e814]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e815] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e816] [cursor=pointer]
+          - generic [ref=f1e820]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e821] [cursor=pointer]:
+              - generic [ref=f1e825]:
+                - strong [ref=f1e826]: New chat
+                - generic [ref=f1e827]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e828] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e829] [cursor=pointer]
+          - generic [ref=f1e833]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e834] [cursor=pointer]:
+              - generic [ref=f1e838]:
+                - strong [ref=f1e839]: New chat
+                - generic [ref=f1e840]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e841] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e842] [cursor=pointer]
+          - generic [ref=f1e846]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e847] [cursor=pointer]:
+              - generic [ref=f1e851]:
+                - strong [ref=f1e852]: New chat
+                - generic [ref=f1e853]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e854] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e855] [cursor=pointer]
+          - generic [ref=f1e859]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e860] [cursor=pointer]:
+              - generic [ref=f1e864]:
+                - strong [ref=f1e865]: New chat
+                - generic [ref=f1e866]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e867] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e868] [cursor=pointer]
+          - generic [ref=f1e872]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e873] [cursor=pointer]:
+              - generic [ref=f1e877]:
+                - strong [ref=f1e878]: New chat
+                - generic [ref=f1e879]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e880] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e881] [cursor=pointer]
+          - generic [ref=f1e78]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e79] [cursor=pointer]:
+              - generic [ref=f1e83]:
+                - strong [ref=f1e84]: New chat
+                - generic [ref=f1e85]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e86] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e87] [cursor=pointer]
+          - generic [ref=f1e91]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e92] [cursor=pointer]:
+              - generic [ref=f1e96]:
+                - strong [ref=f1e97]: New chat
+                - generic [ref=f1e98]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e99] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e100] [cursor=pointer]
+          - generic [ref=f1e104]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e105] [cursor=pointer]:
+              - generic [ref=f1e109]:
+                - strong [ref=f1e110]: New chat
+                - generic [ref=f1e111]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e112] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e113] [cursor=pointer]
+          - generic [ref=f1e117]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e118] [cursor=pointer]:
+              - generic [ref=f1e122]:
+                - strong [ref=f1e123]: New chat
+                - generic [ref=f1e124]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e125] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e126] [cursor=pointer]
+          - generic [ref=f1e130]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e131] [cursor=pointer]:
+              - generic [ref=f1e135]:
+                - strong [ref=f1e136]: New chat
+                - generic [ref=f1e137]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e138] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e139] [cursor=pointer]
+          - generic [ref=f1e143]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e144] [cursor=pointer]:
+              - generic [ref=f1e148]:
+                - strong [ref=f1e149]: New chat
+                - generic [ref=f1e150]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e151] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e152] [cursor=pointer]
+          - generic [ref=f1e156]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e157] [cursor=pointer]:
+              - generic [ref=f1e161]:
+                - strong [ref=f1e162]: New chat
+                - generic [ref=f1e163]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e164] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e165] [cursor=pointer]
+          - generic [ref=f1e169]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e170] [cursor=pointer]:
+              - generic [ref=f1e174]:
+                - strong [ref=f1e175]: New chat
+                - generic [ref=f1e176]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e177] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e178] [cursor=pointer]
+          - generic [ref=f1e182]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e183] [cursor=pointer]:
+              - generic [ref=f1e187]:
+                - strong [ref=f1e188]: New chat
+                - generic [ref=f1e189]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e190] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e191] [cursor=pointer]
+          - generic [ref=f1e195]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e196] [cursor=pointer]:
+              - generic [ref=f1e200]:
+                - strong [ref=f1e201]: New chat
+                - generic [ref=f1e202]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e203] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e204] [cursor=pointer]
+          - generic [ref=f1e208]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e209] [cursor=pointer]:
+              - generic [ref=f1e213]:
+                - strong [ref=f1e214]: New chat
+                - generic [ref=f1e215]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e216] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e217] [cursor=pointer]
+          - generic [ref=f1e221]:
+            - button "New chat لا توجد رسائل بعد" [ref=f1e222] [cursor=pointer]:
+              - generic [ref=f1e226]:
+                - strong [ref=f1e227]: New chat
+                - generic [ref=f1e228]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e229] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e230] [cursor=pointer]
+          - generic [ref=f1e234]:
+            - button "General chat لا توجد رسائل بعد" [ref=f1e235] [cursor=pointer]:
+              - generic [ref=f1e239]:
+                - strong [ref=f1e240]: General chat
+                - generic [ref=f1e241]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=f1e242] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=f1e243] [cursor=pointer]
+    - generic [ref=f1e247]:
+      - button "الإعدادات" [ref=f1e248] [cursor=pointer]
+      - button "قائمة الحساب" [ref=f1e254] [cursor=pointer]:
+        - generic [ref=f1e255]: LU
+        - generic [ref=f1e257]:
+          - strong [ref=f1e258]: Local user
+          - generic [ref=f1e259]: حساب محلي
+  - generic [ref=f1e262]:
+    - banner [ref=f1e263]:
+      - generic [ref=f1e264]:
+        - button "إظهار أو إخفاء الشريط الجانبي" [ref=f1e265] [cursor=pointer]
+        - generic [ref=f1e268]:
+          - strong [ref=f1e269]: الرئيسية
+          - generic [ref=f1e270]: جاهز
+      - generic [ref=f1e271]:
+        - generic [ref=f1e272]: qwen3-coder-30b-a3b-instruct
+        - generic [ref=f1e273]: 0 رمز
+        - generic [ref=f1e274]: وافق على الإجراءات الآمنة
+        - button "لوحة الأوامر" [ref=f1e277] [cursor=pointer]:
+          - generic [ref=f1e280]: Ctrl K
+        - button "لغة الواجهة" [ref=f1e282] [cursor=pointer]
+    - generic [ref=f1e287]:
+      - main [ref=f1e288]:
+        - generic [ref=f1e289]:
+          - generic [ref=f1e290]:
+            - heading "ماذا تريد أن تنجز؟" [level=1] [ref=f1e292]
+            - paragraph [ref=f1e293]: افتح مشروعًا محليًا، ثم صف المهمة بطريقتك. يستخدم HAWK نموذج Qwen مع بث مباشر وقياس للرموز.
+          - button "فتح مشروع محلي" [ref=f1e294] [cursor=pointer]
+          - region "اقتراحات للبدء" [ref=f1e301]:
+            - button "مراجعة مشروع جهّز طلبًا لتحليل البنية والمشكلات" [ref=f1e302] [cursor=pointer]:
+              - generic [ref=f1e308]:
+                - strong [ref=f1e309]: مراجعة مشروع
+                - generic [ref=f1e310]: جهّز طلبًا لتحليل البنية والمشكلات
+            - button "إصلاح مشكلة جهّز طلب تشخيص وإصلاح" [ref=f1e311] [cursor=pointer]:
+              - generic [ref=f1e315]:
+                - strong [ref=f1e316]: إصلاح مشكلة
+                - generic [ref=f1e317]: جهّز طلب تشخيص وإصلاح
+            - button "إعداد Qwen افحص المفتاح والنموذج والاتصال" [ref=f1e318] [cursor=pointer]:
+              - generic [ref=f1e322]:
+                - strong [ref=f1e323]: إعداد Qwen
+                - generic [ref=f1e324]: افحص المفتاح والنموذج والاتصال
+      - generic [ref=f1e325]:
+        - generic [ref=f1e326]:
+          - textbox "اكتب مهمة إلى HAWK…" [ref=f1e327]
+          - generic [ref=f1e328]:
+            - generic [ref=f1e329]:
+              - button "إضافة" [ref=f1e331] [cursor=pointer]
+              - button "خطط أولًا واطرح أسئلة مركزة" [pressed] [ref=f1e333] [cursor=pointer]:
+                - generic [ref=f1e337]: خطط أولًا
+              - button "بدء الإدخال الصوتي" [ref=f1e338] [cursor=pointer]
+              - button "اختيار النموذج" [ref=f1e343] [cursor=pointer]: Qwen3 Coder 30B
+              - button "وضع التفكير" [ref=f1e347] [cursor=pointer]:
+                - generic [ref=f1e348]: "تفكير: عميق"
+              - button "قوة النموذج" [ref=f1e352] [cursor=pointer]:
+                - generic [ref=f1e353]: "القوة: جودة"
+              - button "اختيار الصلاحيات" [ref=f1e357] [cursor=pointer]: وافق على الإجراءات الآمنة
+            - button "إرسال" [disabled] [ref=f1e361]
+        - generic [ref=f1e364]: Enter للإرسال · Shift+Enter لسطر جديد

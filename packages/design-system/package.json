@@ -1,0 +1,15 @@
+{
+  "name": "@hawk-code/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "sideEffects": ["*.css"],
+  "exports": {
+    "./tokens.css": "./tokens.css"
+  },
+  "scripts": {
+    "build": "node scripts/validate.mjs",
+    "lint": "node scripts/validate.mjs",
+    "typecheck": "node scripts/validate.mjs",
+    "test": "node scripts/validate.mjs"
+  }
+}

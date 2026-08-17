@@ -1,0 +1,39 @@
+[package]
+name = "hawk-code-desktop"
+version = "0.1.0"
+description = "HAWK Code desktop core"
+authors = ["HAWK Studio"]
+edition = "2021"
+license = "Proprietary"
+
+[lib]
+name = "hawk_code_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = ["unstable"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+thiserror = "2"
+futures-util = "0.3"
+base64 = "0.22"
+argon2 = { version = "0.5", features = ["std"] }
+keyring = "3"
+rand_core = { version = "0.6", features = ["getrandom"] }
+sha2 = "0.10"
+url = "2"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream"] }
+tokio = { version = "1", features = ["macros", "rt", "sync", "process", "io-util", "time"] }
+tokio-util = "0.7"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

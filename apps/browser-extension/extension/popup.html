@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HAWK Browser Bridge</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <span class="mark">H</span
+      ><span
+        ><strong>HAWK Browser Bridge</strong
+        ><small>User-approved tab access</small></span
+      >
+    </header>
+    <main>
+      <p id="status" role="status">Ready for the active tab.</p>
+      <button id="capture" class="primary" type="button">
+        Capture page context
+      </button>
+      <section>
+        <label for="selector">CSS selector</label
+        ><input id="selector" placeholder="#submit or [aria-label='Search']" />
+        <div class="actions">
+          <button id="click" type="button">Click</button
+          ><button id="type" type="button">Type text</button>
+        </div>
+        <textarea id="text" rows="2" placeholder="Text to enter"></textarea>
+      </section>
+      <button id="export" type="button">Export latest snapshot</button>
+      <small class="privacy"
+        >No persistent host access. Chrome grants this extension access only
+        after you invoke it on the active tab.</small
+      >
+    </main>
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,364 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic "HAWK Code" [ref=e7]:
+        - generic [ref=e9]:
+          - strong [ref=e10]: HAWK
+          - generic [ref=e11]: Code
+      - button "مهمة جديدة" [ref=e12] [cursor=pointer]
+      - button "بحث أو أمر Ctrl K" [ref=e15] [cursor=pointer]:
+        - generic [ref=e19]: بحث أو أمر
+        - generic [ref=e20]: Ctrl K
+      - navigation "التنقل الرئيسي" [ref=e21]:
+        - button "المهام" [ref=e22] [cursor=pointer]
+        - button "مساحات العمل" [ref=e27] [cursor=pointer]
+        - button "تغييرات Git" [ref=e31] [cursor=pointer]
+        - button "الوكلاء" [ref=e37] [cursor=pointer]
+        - button "المهارات" [ref=e42] [cursor=pointer]
+        - button "خوادم MCP" [ref=e47] [cursor=pointer]
+        - button "المتصفح" [ref=e55] [cursor=pointer]
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: المشاريع
+          - button "إضافة أو فتح مشروع" [ref=e65] [cursor=pointer]
+        - button "دردشة عامة محادثة خارج أي مشروع" [ref=e67] [cursor=pointer]:
+          - generic [ref=e68]: دردشة عامة
+          - generic [ref=e72]: محادثة خارج أي مشروع
+        - generic [ref=e73]:
+          - generic [ref=e74]: المحادثات
+          - button "دردشة جديدة" [ref=e75] [cursor=pointer]
+        - generic [ref=e77]:
+          - generic [ref=e623]:
+            - button "اسم جديد قصير لا توجد رسائل بعد" [ref=e1246] [cursor=pointer]:
+              - generic [ref=e758]:
+                - strong [ref=e759]: اسم جديد قصير
+                - generic [ref=e760]: لا توجد رسائل بعد
+            - generic [ref=e761]:
+              - button "خيارات المحادثة" [ref=e763] [cursor=pointer]
+              - button "حذف الدردشة" [ref=e768] [cursor=pointer]
+          - generic [ref=e642]:
+            - button "New chat لا توجد رسائل بعد" [ref=e772] [cursor=pointer]:
+              - generic [ref=e776]:
+                - strong [ref=e777]: New chat
+                - generic [ref=e778]: لا توجد رسائل بعد
+            - generic [ref=e1247]:
+              - button "خيارات المحادثة" [ref=e1249] [cursor=pointer]
+              - button "حذف الدردشة" [ref=e1254] [cursor=pointer]
+          - button "New chat لا توجد رسائل بعد" [ref=e779] [cursor=pointer]:
+            - generic [ref=e783]:
+              - strong [ref=e784]: New chat
+              - generic [ref=e785]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e786] [cursor=pointer]:
+            - generic [ref=e790]:
+              - strong [ref=e791]: New chat
+              - generic [ref=e792]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e793] [cursor=pointer]:
+            - generic [ref=e797]:
+              - strong [ref=e798]: New chat
+              - generic [ref=e799]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e800] [cursor=pointer]:
+            - generic [ref=e804]:
+              - strong [ref=e805]: New chat
+              - generic [ref=e806]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e807] [cursor=pointer]:
+            - generic [ref=e811]:
+              - strong [ref=e812]: New chat
+              - generic [ref=e813]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e814] [cursor=pointer]:
+            - generic [ref=e818]:
+              - strong [ref=e819]: New chat
+              - generic [ref=e820]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e821] [cursor=pointer]:
+            - generic [ref=e825]:
+              - strong [ref=e826]: New chat
+              - generic [ref=e827]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e828] [cursor=pointer]:
+            - generic [ref=e832]:
+              - strong [ref=e833]: New chat
+              - generic [ref=e834]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e835] [cursor=pointer]:
+            - generic [ref=e839]:
+              - strong [ref=e840]: New chat
+              - generic [ref=e841]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e842] [cursor=pointer]:
+            - generic [ref=e846]:
+              - strong [ref=e847]: New chat
+              - generic [ref=e848]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e849] [cursor=pointer]:
+            - generic [ref=e853]:
+              - strong [ref=e854]: New chat
+              - generic [ref=e855]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e856] [cursor=pointer]:
+            - generic [ref=e860]:
+              - strong [ref=e861]: New chat
+              - generic [ref=e862]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e863] [cursor=pointer]:
+            - generic [ref=e867]:
+              - strong [ref=e868]: New chat
+              - generic [ref=e869]: لا توجد رسائل بعد
+          - button "مشروع مع اسم طويل جداً جداً يتجاوز عرض الشريط الجانبي بالكامل لاختبار القطع لا توجد رسائل بعد" [ref=e870] [cursor=pointer]:
+            - generic [ref=e874]:
+              - strong [ref=e875]: مشروع مع اسم طويل جداً جداً يتجاوز عرض الشريط الجانبي بالكامل لاختبار القطع
+              - generic [ref=e876]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e877] [cursor=pointer]:
+            - generic [ref=e881]:
+              - strong [ref=e882]: New chat
+              - generic [ref=e883]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e884] [cursor=pointer]:
+            - generic [ref=e888]:
+              - strong [ref=e889]: New chat
+              - generic [ref=e890]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e891] [cursor=pointer]:
+            - generic [ref=e895]:
+              - strong [ref=e896]: New chat
+              - generic [ref=e897]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e898] [cursor=pointer]:
+            - generic [ref=e902]:
+              - strong [ref=e903]: New chat
+              - generic [ref=e904]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e905] [cursor=pointer]:
+            - generic [ref=e909]:
+              - strong [ref=e910]: New chat
+              - generic [ref=e911]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e912] [cursor=pointer]:
+            - generic [ref=e916]:
+              - strong [ref=e917]: New chat
+              - generic [ref=e918]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e919] [cursor=pointer]:
+            - generic [ref=e923]:
+              - strong [ref=e924]: New chat
+              - generic [ref=e925]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e926] [cursor=pointer]:
+            - generic [ref=e930]:
+              - strong [ref=e931]: New chat
+              - generic [ref=e932]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e933] [cursor=pointer]:
+            - generic [ref=e937]:
+              - strong [ref=e938]: New chat
+              - generic [ref=e939]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e940] [cursor=pointer]:
+            - generic [ref=e944]:
+              - strong [ref=e945]: New chat
+              - generic [ref=e946]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e947] [cursor=pointer]:
+            - generic [ref=e951]:
+              - strong [ref=e952]: New chat
+              - generic [ref=e953]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e954] [cursor=pointer]:
+            - generic [ref=e958]:
+              - strong [ref=e959]: New chat
+              - generic [ref=e960]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e961] [cursor=pointer]:
+            - generic [ref=e965]:
+              - strong [ref=e966]: New chat
+              - generic [ref=e967]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e968] [cursor=pointer]:
+            - generic [ref=e972]:
+              - strong [ref=e973]: New chat
+              - generic [ref=e974]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e975] [cursor=pointer]:
+            - generic [ref=e979]:
+              - strong [ref=e980]: New chat
+              - generic [ref=e981]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e982] [cursor=pointer]:
+            - generic [ref=e986]:
+              - strong [ref=e987]: New chat
+              - generic [ref=e988]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e989] [cursor=pointer]:
+            - generic [ref=e993]:
+              - strong [ref=e994]: New chat
+              - generic [ref=e995]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e996] [cursor=pointer]:
+            - generic [ref=e1000]:
+              - strong [ref=e1001]: New chat
+              - generic [ref=e1002]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1003] [cursor=pointer]:
+            - generic [ref=e1007]:
+              - strong [ref=e1008]: New chat
+              - generic [ref=e1009]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1010] [cursor=pointer]:
+            - generic [ref=e1014]:
+              - strong [ref=e1015]: New chat
+              - generic [ref=e1016]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1017] [cursor=pointer]:
+            - generic [ref=e1021]:
+              - strong [ref=e1022]: New chat
+              - generic [ref=e1023]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1024] [cursor=pointer]:
+            - generic [ref=e1028]:
+              - strong [ref=e1029]: New chat
+              - generic [ref=e1030]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1031] [cursor=pointer]:
+            - generic [ref=e1035]:
+              - strong [ref=e1036]: New chat
+              - generic [ref=e1037]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1038] [cursor=pointer]:
+            - generic [ref=e1042]:
+              - strong [ref=e1043]: New chat
+              - generic [ref=e1044]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1045] [cursor=pointer]:
+            - generic [ref=e1049]:
+              - strong [ref=e1050]: New chat
+              - generic [ref=e1051]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1052] [cursor=pointer]:
+            - generic [ref=e1056]:
+              - strong [ref=e1057]: New chat
+              - generic [ref=e1058]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1059] [cursor=pointer]:
+            - generic [ref=e1063]:
+              - strong [ref=e1064]: New chat
+              - generic [ref=e1065]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1066] [cursor=pointer]:
+            - generic [ref=e1070]:
+              - strong [ref=e1071]: New chat
+              - generic [ref=e1072]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1073] [cursor=pointer]:
+            - generic [ref=e1077]:
+              - strong [ref=e1078]: New chat
+              - generic [ref=e1079]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1080] [cursor=pointer]:
+            - generic [ref=e1084]:
+              - strong [ref=e1085]: New chat
+              - generic [ref=e1086]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1087] [cursor=pointer]:
+            - generic [ref=e1091]:
+              - strong [ref=e1092]: New chat
+              - generic [ref=e1093]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1094] [cursor=pointer]:
+            - generic [ref=e1098]:
+              - strong [ref=e1099]: New chat
+              - generic [ref=e1100]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1101] [cursor=pointer]:
+            - generic [ref=e1105]:
+              - strong [ref=e1106]: New chat
+              - generic [ref=e1107]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1108] [cursor=pointer]:
+            - generic [ref=e1112]:
+              - strong [ref=e1113]: New chat
+              - generic [ref=e1114]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1115] [cursor=pointer]:
+            - generic [ref=e1119]:
+              - strong [ref=e1120]: New chat
+              - generic [ref=e1121]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1122] [cursor=pointer]:
+            - generic [ref=e1126]:
+              - strong [ref=e1127]: New chat
+              - generic [ref=e1128]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1129] [cursor=pointer]:
+            - generic [ref=e1133]:
+              - strong [ref=e1134]: New chat
+              - generic [ref=e1135]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1136] [cursor=pointer]:
+            - generic [ref=e1140]:
+              - strong [ref=e1141]: New chat
+              - generic [ref=e1142]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1143] [cursor=pointer]:
+            - generic [ref=e1147]:
+              - strong [ref=e1148]: New chat
+              - generic [ref=e1149]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1150] [cursor=pointer]:
+            - generic [ref=e1154]:
+              - strong [ref=e1155]: New chat
+              - generic [ref=e1156]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1157] [cursor=pointer]:
+            - generic [ref=e1161]:
+              - strong [ref=e1162]: New chat
+              - generic [ref=e1163]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1164] [cursor=pointer]:
+            - generic [ref=e1168]:
+              - strong [ref=e1169]: New chat
+              - generic [ref=e1170]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1171] [cursor=pointer]:
+            - generic [ref=e1175]:
+              - strong [ref=e1176]: New chat
+              - generic [ref=e1177]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1178] [cursor=pointer]:
+            - generic [ref=e1182]:
+              - strong [ref=e1183]: New chat
+              - generic [ref=e1184]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1185] [cursor=pointer]:
+            - generic [ref=e1189]:
+              - strong [ref=e1190]: New chat
+              - generic [ref=e1191]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1192] [cursor=pointer]:
+            - generic [ref=e1196]:
+              - strong [ref=e1197]: New chat
+              - generic [ref=e1198]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1199] [cursor=pointer]:
+            - generic [ref=e1203]:
+              - strong [ref=e1204]: New chat
+              - generic [ref=e1205]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1206] [cursor=pointer]:
+            - generic [ref=e1210]:
+              - strong [ref=e1211]: New chat
+              - generic [ref=e1212]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1213] [cursor=pointer]:
+            - generic [ref=e1217]:
+              - strong [ref=e1218]: New chat
+              - generic [ref=e1219]: لا توجد رسائل بعد
+          - button "New chat لا توجد رسائل بعد" [ref=e1220] [cursor=pointer]:
+            - generic [ref=e1224]:
+              - strong [ref=e1225]: New chat
+              - generic [ref=e1226]: لا توجد رسائل بعد
+          - button "General chat لا توجد رسائل بعد" [ref=e1227] [cursor=pointer]:
+            - generic [ref=e1231]:
+              - strong [ref=e1232]: General chat
+              - generic [ref=e1233]: لا توجد رسائل بعد
+    - generic [ref=e505]:
+      - button "الإعدادات" [ref=e506] [cursor=pointer]
+      - button "قائمة الحساب" [ref=e512] [cursor=pointer]:
+        - generic [ref=e513]: LU
+        - generic [ref=e515]:
+          - strong [ref=e516]: Local user
+          - generic [ref=e517]: حساب محلي
+  - generic [ref=e520]:
+    - banner [ref=e521]:
+      - generic [ref=e522]:
+        - button "إظهار أو إخفاء الشريط الجانبي" [ref=e523] [cursor=pointer]
+        - generic [ref=e526]:
+          - strong [ref=e527]: الرئيسية
+          - generic [ref=e528]: جاهز
+      - generic [ref=e529]:
+        - generic [ref=e530]: qwen3-coder-30b-a3b-instruct
+        - generic [ref=e531]: 0 رمز
+        - generic [ref=e532]: وافق على الإجراءات الآمنة
+        - button "لوحة الأوامر" [ref=e535] [cursor=pointer]:
+          - generic [ref=e538]: Ctrl K
+        - button "لغة الواجهة" [ref=e540] [cursor=pointer]
+    - generic [ref=e545]:
+      - main [ref=e546]:
+        - generic [ref=e547]:
+          - generic [ref=e548]:
+            - heading "ماذا تريد أن تنجز؟" [level=1] [ref=e550]
+            - paragraph [ref=e551]: افتح مشروعًا محليًا، ثم صف المهمة بطريقتك. يستخدم HAWK نموذج Qwen مع بث مباشر وقياس للرموز.
+          - button "فتح مشروع محلي" [ref=e552] [cursor=pointer]
+          - region "اقتراحات للبدء" [ref=e559]:
+            - button "مراجعة مشروع جهّز طلبًا لتحليل البنية والمشكلات" [ref=e560] [cursor=pointer]:
+              - generic [ref=e566]:
+                - strong [ref=e567]: مراجعة مشروع
+                - generic [ref=e568]: جهّز طلبًا لتحليل البنية والمشكلات
+            - button "إصلاح مشكلة جهّز طلب تشخيص وإصلاح" [ref=e569] [cursor=pointer]:
+              - generic [ref=e573]:
+                - strong [ref=e574]: إصلاح مشكلة
+                - generic [ref=e575]: جهّز طلب تشخيص وإصلاح
+            - button "إعداد Qwen افحص المفتاح والنموذج والاتصال" [ref=e576] [cursor=pointer]:
+              - generic [ref=e580]:
+                - strong [ref=e581]: إعداد Qwen
+                - generic [ref=e582]: افحص المفتاح والنموذج والاتصال
+      - generic [ref=e583]:
+        - generic [ref=e584]:
+          - textbox "اكتب مهمة إلى HAWK…" [ref=e585]
+          - generic [ref=e586]:
+            - generic [ref=e587]:
+              - button "إضافة" [ref=e589] [cursor=pointer]
+              - button "خطط أولًا واطرح أسئلة مركزة" [pressed] [ref=e591] [cursor=pointer]:
+                - generic [ref=e595]: خطط أولًا
+              - button "بدء الإدخال الصوتي" [ref=e596] [cursor=pointer]
+              - button "اختيار النموذج" [ref=e601] [cursor=pointer]: Qwen3 Coder 30B
+              - button "وضع التفكير" [ref=e605] [cursor=pointer]:
+                - generic [ref=e606]: "تفكير: عميق"
+              - button "قوة النموذج" [ref=e610] [cursor=pointer]:
+                - generic [ref=e611]: "القوة: جودة"
+              - button "اختيار الصلاحيات" [ref=e615] [cursor=pointer]: وافق على الإجراءات الآمنة
+            - button "إرسال" [disabled] [ref=e619]
+        - generic [ref=e622]: Enter للإرسال · Shift+Enter لسطر جديد

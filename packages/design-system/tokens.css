@@ -1,0 +1,78 @@
+:root {
+  color-scheme: dark;
+  --hawk-night: #0d0e0c;
+  --hawk-ink: #10110f;
+  --hawk-surface: #171815;
+  --hawk-elevated: #1d1f1a;
+  --hawk-cream: #f2f0e9;
+  --hawk-lime: #b8ff45;
+  --hawk-soft-gray: #a5a69e;
+  --hawk-muted-gray: #6f706a;
+  --hawk-success: #70e000;
+  --hawk-warning: #ffb020;
+  --hawk-error: #ff5c5c;
+  --hawk-info: #5fa8ff;
+  --hawk-border: rgba(242, 240, 233, 0.1);
+  --hawk-border-strong: rgba(242, 240, 233, 0.17);
+  --hawk-lime-muted: rgba(184, 255, 69, 0.1);
+  --hawk-focus: 0 0 0 2px var(--hawk-night), 0 0 0 4px var(--hawk-lime);
+  --hawk-shell: #111210;
+  --hawk-sidebar: #141513;
+  --hawk-topbar: rgba(13, 14, 12, 0.96);
+  --hawk-composer: #20211e;
+  --hawk-overlay: #1b1c19;
+  --hawk-shadow: rgba(0, 0, 0, 0.42);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --font-ui: "Inter Variable", Inter, "Segoe UI Variable", "Segoe UI", sans-serif;
+  --font-ar: "Noto Sans Arabic Variable", "Noto Sans Arabic", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", "Cascadia Code", Consolas, monospace;
+
+  --motion-fast: 120ms;
+  --motion-panel: 190ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --hawk-night: #f7f7f4;
+  --hawk-ink: #ffffff;
+  --hawk-surface: #ffffff;
+  --hawk-elevated: #efefeb;
+  --hawk-cream: #1b1c18;
+  --hawk-lime: #7bdc1c;
+  --hawk-soft-gray: #565852;
+  --hawk-muted-gray: #74766f;
+  --hawk-success: #278a19;
+  --hawk-warning: #a85d00;
+  --hawk-error: #c83737;
+  --hawk-info: #2563b8;
+  --hawk-border: rgba(27, 28, 24, 0.11);
+  --hawk-border-strong: rgba(27, 28, 24, 0.19);
+  --hawk-lime-muted: rgba(82, 155, 13, 0.1);
+  --hawk-focus: 0 0 0 2px #ffffff, 0 0 0 4px #5aa812;
+  --hawk-shell: #f4f4f1;
+  --hawk-sidebar: #f8f8f6;
+  --hawk-topbar: rgba(255, 255, 253, 0.96);
+  --hawk-composer: #ffffff;
+  --hawk-overlay: #ffffff;
+  --hawk-shadow: rgba(30, 32, 26, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-panel: 0ms;
+  }
+}

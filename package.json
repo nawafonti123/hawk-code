@@ -1,0 +1,33 @@
+{
+  "name": "hawk-code",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HAWK Code — AI Engineering Command Center",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "turbo dev --filter=@hawk-code/desktop",
+    "dev:desktop": "pnpm --filter @hawk-code/desktop tauri dev",
+    "dev:web": "pnpm --filter @hawk-code/desktop dev",
+    "dev:extension": "pnpm --filter @hawk-code/browser-extension build",
+    "build": "turbo build",
+    "build:desktop": "pnpm --filter @hawk-code/desktop tauri build",
+    "build:extension": "pnpm --filter @hawk-code/browser-extension build",
+    "modal:deploy": "python -m modal deploy infra/modal/app.py --env hawk-code",
+    "modal:serve": "python -m modal serve infra/modal/app.py --env hawk-code",
+    "modal:logs": "python -m modal app logs hawk-code-ai --env hawk-code",
+    "modal:stop": "python -m modal app stop hawk-code-ai --env hawk-code",
+    "modal:test": "python -m modal run infra/modal/app.py --env hawk-code",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "latest",
+    "turbo": "latest"
+  }
+}

@@ -1,0 +1,538 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic "HAWK Code" [ref=e7]:
+        - generic [ref=e9]:
+          - strong [ref=e10]: HAWK
+          - generic [ref=e11]: Code
+      - button "مهمة جديدة" [ref=e12] [cursor=pointer]
+      - button "بحث أو أمر Ctrl K" [ref=e15] [cursor=pointer]:
+        - generic [ref=e19]: بحث أو أمر
+        - generic [ref=e20]: Ctrl K
+      - navigation "التنقل الرئيسي" [ref=e21]:
+        - button "المهام" [ref=e22] [cursor=pointer]
+        - button "مساحات العمل" [ref=e27] [cursor=pointer]
+        - button "تغييرات Git" [ref=e31] [cursor=pointer]
+        - button "الوكلاء" [ref=e37] [cursor=pointer]
+        - button "المهارات" [ref=e42] [cursor=pointer]
+        - button "خوادم MCP" [ref=e47] [cursor=pointer]
+        - button "المتصفح" [ref=e55] [cursor=pointer]
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: المشاريع
+          - button "إضافة أو فتح مشروع" [ref=e65] [cursor=pointer]
+        - button "دردشة عامة محادثة خارج أي مشروع" [ref=e67] [cursor=pointer]:
+          - generic [ref=e68]: دردشة عامة
+          - generic [ref=e72]: محادثة خارج أي مشروع
+        - generic [ref=e73]:
+          - generic [ref=e74]: المحادثات
+          - button "دردشة جديدة" [ref=e75] [cursor=pointer]
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - button "مشروع مع اسم طويل جداً جداً يتجاوز عرض الشريط الجانبي بالكامل لاختبار القطع لا توجد رسائل بعد" [ref=e79] [cursor=pointer]:
+              - generic [ref=e83]:
+                - strong [ref=e84]: مشروع مع اسم طويل جداً جداً يتجاوز عرض الشريط الجانبي بالكامل لاختبار القطع
+                - generic [ref=e85]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e86] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e87] [cursor=pointer]
+          - generic [ref=e91]:
+            - button "New chat لا توجد رسائل بعد" [ref=e92] [cursor=pointer]:
+              - generic [ref=e96]:
+                - strong [ref=e97]: New chat
+                - generic [ref=e98]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e99] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e100] [cursor=pointer]
+          - generic [ref=e104]:
+            - button "New chat لا توجد رسائل بعد" [ref=e105] [cursor=pointer]:
+              - generic [ref=e109]:
+                - strong [ref=e110]: New chat
+                - generic [ref=e111]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e112] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e113] [cursor=pointer]
+          - generic [ref=e117]:
+            - button "New chat لا توجد رسائل بعد" [ref=e118] [cursor=pointer]:
+              - generic [ref=e122]:
+                - strong [ref=e123]: New chat
+                - generic [ref=e124]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e125] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e126] [cursor=pointer]
+          - generic [ref=e130]:
+            - button "New chat لا توجد رسائل بعد" [ref=e131] [cursor=pointer]:
+              - generic [ref=e135]:
+                - strong [ref=e136]: New chat
+                - generic [ref=e137]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e138] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e139] [cursor=pointer]
+          - generic [ref=e143]:
+            - button "New chat لا توجد رسائل بعد" [ref=e144] [cursor=pointer]:
+              - generic [ref=e148]:
+                - strong [ref=e149]: New chat
+                - generic [ref=e150]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e151] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e152] [cursor=pointer]
+          - generic [ref=e156]:
+            - button "New chat لا توجد رسائل بعد" [ref=e157] [cursor=pointer]:
+              - generic [ref=e161]:
+                - strong [ref=e162]: New chat
+                - generic [ref=e163]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e164] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e165] [cursor=pointer]
+          - generic [ref=e169]:
+            - button "New chat لا توجد رسائل بعد" [ref=e170] [cursor=pointer]:
+              - generic [ref=e174]:
+                - strong [ref=e175]: New chat
+                - generic [ref=e176]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e177] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e178] [cursor=pointer]
+          - generic [ref=e182]:
+            - button "New chat لا توجد رسائل بعد" [ref=e183] [cursor=pointer]:
+              - generic [ref=e187]:
+                - strong [ref=e188]: New chat
+                - generic [ref=e189]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e190] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e191] [cursor=pointer]
+          - generic [ref=e195]:
+            - button "New chat لا توجد رسائل بعد" [ref=e196] [cursor=pointer]:
+              - generic [ref=e200]:
+                - strong [ref=e201]: New chat
+                - generic [ref=e202]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e203] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e204] [cursor=pointer]
+          - generic [ref=e208]:
+            - button "New chat لا توجد رسائل بعد" [ref=e209] [cursor=pointer]:
+              - generic [ref=e213]:
+                - strong [ref=e214]: New chat
+                - generic [ref=e215]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e216] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e217] [cursor=pointer]
+          - generic [ref=e221]:
+            - button "New chat لا توجد رسائل بعد" [ref=e222] [cursor=pointer]:
+              - generic [ref=e226]:
+                - strong [ref=e227]: New chat
+                - generic [ref=e228]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e229] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e230] [cursor=pointer]
+          - generic [ref=e234]:
+            - button "New chat لا توجد رسائل بعد" [ref=e235] [cursor=pointer]:
+              - generic [ref=e239]:
+                - strong [ref=e240]: New chat
+                - generic [ref=e241]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e242] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e243] [cursor=pointer]
+          - generic [ref=e247]:
+            - button "New chat لا توجد رسائل بعد" [ref=e248] [cursor=pointer]:
+              - generic [ref=e252]:
+                - strong [ref=e253]: New chat
+                - generic [ref=e254]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e255] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e256] [cursor=pointer]
+          - generic [ref=e260]:
+            - button "New chat لا توجد رسائل بعد" [ref=e261] [cursor=pointer]:
+              - generic [ref=e265]:
+                - strong [ref=e266]: New chat
+                - generic [ref=e267]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e268] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e269] [cursor=pointer]
+          - generic [ref=e273]:
+            - button "New chat لا توجد رسائل بعد" [ref=e274] [cursor=pointer]:
+              - generic [ref=e278]:
+                - strong [ref=e279]: New chat
+                - generic [ref=e280]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e281] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e282] [cursor=pointer]
+          - generic [ref=e286]:
+            - button "New chat لا توجد رسائل بعد" [ref=e287] [cursor=pointer]:
+              - generic [ref=e291]:
+                - strong [ref=e292]: New chat
+                - generic [ref=e293]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e294] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e295] [cursor=pointer]
+          - generic [ref=e299]:
+            - button "New chat لا توجد رسائل بعد" [ref=e300] [cursor=pointer]:
+              - generic [ref=e304]:
+                - strong [ref=e305]: New chat
+                - generic [ref=e306]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e307] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e308] [cursor=pointer]
+          - generic [ref=e312]:
+            - button "New chat لا توجد رسائل بعد" [ref=e313] [cursor=pointer]:
+              - generic [ref=e317]:
+                - strong [ref=e318]: New chat
+                - generic [ref=e319]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e320] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e321] [cursor=pointer]
+          - generic [ref=e325]:
+            - button "New chat لا توجد رسائل بعد" [ref=e326] [cursor=pointer]:
+              - generic [ref=e330]:
+                - strong [ref=e331]: New chat
+                - generic [ref=e332]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e333] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e334] [cursor=pointer]
+          - generic [ref=e338]:
+            - button "New chat لا توجد رسائل بعد" [ref=e339] [cursor=pointer]:
+              - generic [ref=e343]:
+                - strong [ref=e344]: New chat
+                - generic [ref=e345]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e346] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e347] [cursor=pointer]
+          - generic [ref=e351]:
+            - button "New chat لا توجد رسائل بعد" [ref=e352] [cursor=pointer]:
+              - generic [ref=e356]:
+                - strong [ref=e357]: New chat
+                - generic [ref=e358]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e359] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e360] [cursor=pointer]
+          - generic [ref=e364]:
+            - button "New chat لا توجد رسائل بعد" [ref=e365] [cursor=pointer]:
+              - generic [ref=e369]:
+                - strong [ref=e370]: New chat
+                - generic [ref=e371]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e372] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e373] [cursor=pointer]
+          - generic [ref=e377]:
+            - button "New chat لا توجد رسائل بعد" [ref=e378] [cursor=pointer]:
+              - generic [ref=e382]:
+                - strong [ref=e383]: New chat
+                - generic [ref=e384]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e385] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e386] [cursor=pointer]
+          - generic [ref=e390]:
+            - button "New chat لا توجد رسائل بعد" [ref=e391] [cursor=pointer]:
+              - generic [ref=e395]:
+                - strong [ref=e396]: New chat
+                - generic [ref=e397]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e398] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e399] [cursor=pointer]
+          - generic [ref=e403]:
+            - button "New chat لا توجد رسائل بعد" [ref=e404] [cursor=pointer]:
+              - generic [ref=e408]:
+                - strong [ref=e409]: New chat
+                - generic [ref=e410]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e411] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e412] [cursor=pointer]
+          - generic [ref=e416]:
+            - button "New chat لا توجد رسائل بعد" [ref=e417] [cursor=pointer]:
+              - generic [ref=e421]:
+                - strong [ref=e422]: New chat
+                - generic [ref=e423]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e424] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e425] [cursor=pointer]
+          - generic [ref=e429]:
+            - button "New chat لا توجد رسائل بعد" [ref=e430] [cursor=pointer]:
+              - generic [ref=e434]:
+                - strong [ref=e435]: New chat
+                - generic [ref=e436]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e437] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e438] [cursor=pointer]
+          - generic [ref=e442]:
+            - button "New chat لا توجد رسائل بعد" [ref=e443] [cursor=pointer]:
+              - generic [ref=e447]:
+                - strong [ref=e448]: New chat
+                - generic [ref=e449]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e450] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e451] [cursor=pointer]
+          - generic [ref=e455]:
+            - button "New chat لا توجد رسائل بعد" [ref=e456] [cursor=pointer]:
+              - generic [ref=e460]:
+                - strong [ref=e461]: New chat
+                - generic [ref=e462]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e463] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e464] [cursor=pointer]
+          - generic [ref=e468]:
+            - button "New chat لا توجد رسائل بعد" [ref=e469] [cursor=pointer]:
+              - generic [ref=e473]:
+                - strong [ref=e474]: New chat
+                - generic [ref=e475]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e476] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e477] [cursor=pointer]
+          - generic [ref=e481]:
+            - button "New chat لا توجد رسائل بعد" [ref=e482] [cursor=pointer]:
+              - generic [ref=e486]:
+                - strong [ref=e487]: New chat
+                - generic [ref=e488]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e489] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e490] [cursor=pointer]
+          - generic [ref=e494]:
+            - button "New chat لا توجد رسائل بعد" [ref=e495] [cursor=pointer]:
+              - generic [ref=e499]:
+                - strong [ref=e500]: New chat
+                - generic [ref=e501]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e502] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e503] [cursor=pointer]
+          - generic [ref=e507]:
+            - button "New chat لا توجد رسائل بعد" [ref=e508] [cursor=pointer]:
+              - generic [ref=e512]:
+                - strong [ref=e513]: New chat
+                - generic [ref=e514]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e515] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e516] [cursor=pointer]
+          - generic [ref=e520]:
+            - button "New chat لا توجد رسائل بعد" [ref=e521] [cursor=pointer]:
+              - generic [ref=e525]:
+                - strong [ref=e526]: New chat
+                - generic [ref=e527]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e528] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e529] [cursor=pointer]
+          - generic [ref=e533]:
+            - button "New chat لا توجد رسائل بعد" [ref=e534] [cursor=pointer]:
+              - generic [ref=e538]:
+                - strong [ref=e539]: New chat
+                - generic [ref=e540]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e541] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e542] [cursor=pointer]
+          - generic [ref=e546]:
+            - button "New chat لا توجد رسائل بعد" [ref=e547] [cursor=pointer]:
+              - generic [ref=e551]:
+                - strong [ref=e552]: New chat
+                - generic [ref=e553]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e554] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e555] [cursor=pointer]
+          - generic [ref=e559]:
+            - button "New chat لا توجد رسائل بعد" [ref=e560] [cursor=pointer]:
+              - generic [ref=e564]:
+                - strong [ref=e565]: New chat
+                - generic [ref=e566]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e567] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e568] [cursor=pointer]
+          - generic [ref=e572]:
+            - button "New chat لا توجد رسائل بعد" [ref=e573] [cursor=pointer]:
+              - generic [ref=e577]:
+                - strong [ref=e578]: New chat
+                - generic [ref=e579]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e580] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e581] [cursor=pointer]
+          - generic [ref=e585]:
+            - button "New chat لا توجد رسائل بعد" [ref=e586] [cursor=pointer]:
+              - generic [ref=e590]:
+                - strong [ref=e591]: New chat
+                - generic [ref=e592]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e593] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e594] [cursor=pointer]
+          - generic [ref=e598]:
+            - button "New chat لا توجد رسائل بعد" [ref=e599] [cursor=pointer]:
+              - generic [ref=e603]:
+                - strong [ref=e604]: New chat
+                - generic [ref=e605]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e606] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e607] [cursor=pointer]
+          - generic [ref=e611]:
+            - button "New chat لا توجد رسائل بعد" [ref=e612] [cursor=pointer]:
+              - generic [ref=e616]:
+                - strong [ref=e617]: New chat
+                - generic [ref=e618]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e619] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e620] [cursor=pointer]
+          - generic [ref=e624]:
+            - button "New chat لا توجد رسائل بعد" [ref=e625] [cursor=pointer]:
+              - generic [ref=e629]:
+                - strong [ref=e630]: New chat
+                - generic [ref=e631]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e632] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e633] [cursor=pointer]
+          - generic [ref=e637]:
+            - button "New chat لا توجد رسائل بعد" [ref=e638] [cursor=pointer]:
+              - generic [ref=e642]:
+                - strong [ref=e643]: New chat
+                - generic [ref=e644]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e645] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e646] [cursor=pointer]
+          - generic [ref=e650]:
+            - button "New chat لا توجد رسائل بعد" [ref=e651] [cursor=pointer]:
+              - generic [ref=e655]:
+                - strong [ref=e656]: New chat
+                - generic [ref=e657]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e658] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e659] [cursor=pointer]
+          - generic [ref=e663]:
+            - button "New chat لا توجد رسائل بعد" [ref=e664] [cursor=pointer]:
+              - generic [ref=e668]:
+                - strong [ref=e669]: New chat
+                - generic [ref=e670]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e671] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e672] [cursor=pointer]
+          - generic [ref=e676]:
+            - button "New chat لا توجد رسائل بعد" [ref=e677] [cursor=pointer]:
+              - generic [ref=e681]:
+                - strong [ref=e682]: New chat
+                - generic [ref=e683]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e684] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e685] [cursor=pointer]
+          - generic [ref=e689]:
+            - button "New chat لا توجد رسائل بعد" [ref=e690] [cursor=pointer]:
+              - generic [ref=e694]:
+                - strong [ref=e695]: New chat
+                - generic [ref=e696]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e697] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e698] [cursor=pointer]
+          - generic [ref=e702]:
+            - button "New chat لا توجد رسائل بعد" [ref=e703] [cursor=pointer]:
+              - generic [ref=e707]:
+                - strong [ref=e708]: New chat
+                - generic [ref=e709]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e710] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e711] [cursor=pointer]
+          - generic [ref=e715]:
+            - button "New chat لا توجد رسائل بعد" [ref=e716] [cursor=pointer]:
+              - generic [ref=e720]:
+                - strong [ref=e721]: New chat
+                - generic [ref=e722]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e723] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e724] [cursor=pointer]
+          - generic [ref=e728]:
+            - button "New chat لا توجد رسائل بعد" [ref=e729] [cursor=pointer]:
+              - generic [ref=e733]:
+                - strong [ref=e734]: New chat
+                - generic [ref=e735]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e736] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e737] [cursor=pointer]
+          - generic [ref=e741]:
+            - button "General chat لا توجد رسائل بعد" [ref=e742] [cursor=pointer]:
+              - generic [ref=e746]:
+                - strong [ref=e747]: General chat
+                - generic [ref=e748]: لا توجد رسائل بعد
+            - button "تغيير اسم الدردشة" [ref=e749] [cursor=pointer]: •••
+            - button "حذف الدردشة" [ref=e750] [cursor=pointer]
+    - generic [ref=e754]:
+      - button "الإعدادات" [active] [ref=e755] [cursor=pointer]
+      - button "قائمة الحساب" [ref=e761] [cursor=pointer]:
+        - generic [ref=e762]: LU
+        - generic [ref=e764]:
+          - strong [ref=e765]: Local user
+          - generic [ref=e766]: حساب محلي
+  - generic [ref=e769]:
+    - banner [ref=e770]:
+      - generic [ref=e771]:
+        - button "إظهار أو إخفاء الشريط الجانبي" [ref=e772] [cursor=pointer]
+        - generic [ref=e775]:
+          - strong [ref=e776]: الرئيسية
+          - generic [ref=e777]: جاهز
+      - generic [ref=e778]:
+        - generic [ref=e779]: qwen3-coder-30b-a3b-instruct
+        - generic [ref=e780]: 0 رمز
+        - generic [ref=e781]: وافق على الإجراءات الآمنة
+        - button "لوحة الأوامر" [ref=e784] [cursor=pointer]:
+          - generic [ref=e787]: Ctrl K
+        - button "لغة الواجهة" [ref=e789] [cursor=pointer]
+    - main [ref=e872]:
+      - generic [ref=e873]:
+        - text: HAWK CODE
+        - heading "الإعدادات" [level=1] [ref=e874]
+        - paragraph [ref=e875]: تحكم في المزود والمظهر والصلاحيات واللغة واتصالات الحساب.
+      - region [ref=e876]:
+        - heading "المظهر" [level=2] [ref=e877]
+        - generic [ref=e878]:
+          - generic [ref=e879]:
+            - generic [ref=e886]:
+              - strong [ref=e887]: المظهر
+              - generic [ref=e888]: استخدم مظهر النظام أو اختر الوضع الفاتح أو الداكن.
+            - generic "المظهر" [ref=e889]:
+              - button "النظام" [ref=e890] [cursor=pointer]
+              - button "فاتح" [ref=e894] [cursor=pointer]
+              - button "داكن" [ref=e902] [cursor=pointer]
+          - generic [ref=e906]:
+            - generic [ref=e911]:
+              - strong [ref=e912]: لغة الواجهة
+              - generic [ref=e913]: حزم لغات مراجعة للقوائم ونصوص التطبيق
+            - generic [ref=e914]:
+              - combobox "لغة الواجهة حزم لغات مراجعة للقوائم ونصوص التطبيق استيراد حزمة" [ref=e915]:
+                - option "العربية — مراجعة" [selected]
+                - option "English — مراجعة"
+                - option "Français — إنشاء عبر Qwen"
+                - option "Español — إنشاء عبر Qwen"
+                - option "Deutsch — إنشاء عبر Qwen"
+                - option "Italiano — إنشاء عبر Qwen"
+                - option "Português (Brasil) — إنشاء عبر Qwen"
+                - option "Português (Portugal) — إنشاء عبر Qwen"
+                - option "Nederlands — إنشاء عبر Qwen"
+                - option "Svenska — إنشاء عبر Qwen"
+                - option "Norsk — إنشاء عبر Qwen"
+                - option "Dansk — إنشاء عبر Qwen"
+                - option "Suomi — إنشاء عبر Qwen"
+                - option "Íslenska — إنشاء عبر Qwen"
+                - option "Polski — إنشاء عبر Qwen"
+                - option "Čeština — إنشاء عبر Qwen"
+                - option "Slovenčina — إنشاء عبر Qwen"
+                - option "Slovenščina — إنشاء عبر Qwen"
+                - option "Hrvatski — إنشاء عبر Qwen"
+                - option "Српски — إنشاء عبر Qwen"
+                - option "Bosanski — إنشاء عبر Qwen"
+                - option "Română — إنشاء عبر Qwen"
+                - option "Magyar — إنشاء عبر Qwen"
+                - option "Ελληνικά — إنشاء عبر Qwen"
+                - option "Български — إنشاء عبر Qwen"
+                - option "Українська — إنشاء عبر Qwen"
+                - option "Русский — إنشاء عبر Qwen"
+                - option "Türkçe — إنشاء عبر Qwen"
+                - option "עברית — إنشاء عبر Qwen"
+                - option "فارسی — إنشاء عبر Qwen"
+                - option "اردو — إنشاء عبر Qwen"
+                - option "हिन्दी — إنشاء عبر Qwen"
+                - option "বাংলা — إنشاء عبر Qwen"
+                - option "ਪੰਜਾਬੀ — إنشاء عبر Qwen"
+                - option "ગુજરાતી — إنشاء عبر Qwen"
+                - option "मराठी — إنشاء عبر Qwen"
+                - option "தமிழ் — إنشاء عبر Qwen"
+                - option "తెలుగు — إنشاء عبر Qwen"
+                - option "ಕನ್ನಡ — إنشاء عبر Qwen"
+                - option "മലയാളം — إنشاء عبر Qwen"
+                - option "ไทย — إنشاء عبر Qwen"
+                - option "Tiếng Việt — إنشاء عبر Qwen"
+                - option "Bahasa Indonesia — إنشاء عبر Qwen"
+                - option "Bahasa Melayu — إنشاء عبر Qwen"
+                - option "Filipino — إنشاء عبر Qwen"
+                - option "简体中文 — إنشاء عبر Qwen"
+                - option "繁體中文 — إنشاء عبر Qwen"
+                - option "日本語 — إنشاء عبر Qwen"
+                - option "한국어 — إنشاء عبر Qwen"
+                - option "Kiswahili — إنشاء عبر Qwen"
+                - option "አማርኛ — إنشاء عبر Qwen"
+                - option "Afrikaans — إنشاء عبر Qwen"
+                - option "Shqip — إنشاء عبر Qwen"
+                - option "Azərbaycanca — إنشاء عبر Qwen"
+                - option "ქართული — إنشاء عبر Qwen"
+                - option "Հայերեն — إنشاء عبر Qwen"
+                - option "Қазақша — إنشاء عبر Qwen"
+                - option "O‘zbekcha — إنشاء عبر Qwen"
+              - button "استيراد حزمة" [ref=e916] [cursor=pointer]
+          - paragraph [ref=e920]: اختر من القائمة الموسعة. العربية والإنجليزية مراجعتان؛ تُنشأ اللغات الأخرى عند الطلب بواسطة Qwen ثم تتحقق وتحفظ محليًا. ويمكن أيضًا استيراد حزمة BCP-47 مراجعة.
+      - region [ref=e921]:
+        - heading "الصلاحيات الافتراضية" [level=2] [ref=e922]
+        - generic [ref=e923]:
+          - button "اسأل للتأكيد اسأل قبل التعديل أو الأوامر أو الشبكة أو الإجراءات الخارجية" [ref=e924] [cursor=pointer]:
+            - generic [ref=e928]:
+              - strong [ref=e929]: اسأل للتأكيد
+              - generic [ref=e930]: اسأل قبل التعديل أو الأوامر أو الشبكة أو الإجراءات الخارجية
+          - button "وافق على الإجراءات الآمنة تابع داخل المشروع واسأل عن الإجراءات الحساسة" [ref=e931] [cursor=pointer]:
+            - generic [ref=e935]:
+              - strong [ref=e936]: وافق على الإجراءات الآمنة
+              - generic [ref=e937]: تابع داخل المشروع واسأل عن الإجراءات الحساسة
+          - button "وصول كامل وصول واسع للمشروع والشبكة؛ تبقى الإجراءات الحرجة بحاجة لتأكيد" [ref=e941] [cursor=pointer]:
+            - generic [ref=e945]:
+              - strong [ref=e946]: وصول كامل
+              - generic [ref=e947]: وصول واسع للمشروع والشبكة؛ تبقى الإجراءات الحرجة بحاجة لتأكيد
+      - region [ref=e948]:
+        - heading "مزود الذكاء الاصطناعي — Qwen" [level=2] [ref=e949]
+        - generic [ref=e950]:
+          - generic [ref=e951]:
+            - generic [ref=e952]:
+              - generic [ref=e953]: M
+              - generic [ref=e954]:
+                - strong [ref=e955]: Qwen3 Coder · Modal GPU
+                - generic [ref=e956]: لا يوجد مفتاح محفوظ
+            - emphasis [ref=e957]: مطلوب
+          - generic [ref=e958]:
+            - generic [ref=e959]: مفتاح API
+            - textbox "مفتاح API" [ref=e960]:
+              - /placeholder: sk-••••••••
+          - generic [ref=e961]:
+            - generic [ref=e962]: Base URL
+            - textbox "Base URL" [ref=e963]: https://mjakcon8-hawk-code--hawk-code-ai-hawkmodel-web.modal.run/v1
+          - generic [ref=e964]:
+            - generic [ref=e965]: النموذج
+            - combobox "النموذج" [ref=e966]:
+              - option "Qwen3 Coder 30B · Modal GPU · أفضل جودة" [selected]
+          - generic [ref=e967]:
+            - button "حفظ المفتاح" [disabled] [ref=e968]
+            - button "اختبار الاتصال" [disabled] [ref=e972]
+            - button "حذف المفتاح" [disabled] [ref=e976]
+          - paragraph [ref=e980]: لا يدخل المفتاح إلى React أو SQLite أو Local Storage؛ يُحفظ في Windows Credential Manager ويرسل إلى نطاقات Alibaba الرسمية فقط.

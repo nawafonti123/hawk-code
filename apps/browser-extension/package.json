@@ -1,0 +1,11 @@
+{
+  "name": "@hawk-code/browser-extension",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/validate.mjs",
+    "lint": "node scripts/validate.mjs",
+    "typecheck": "node scripts/validate.mjs",
+    "test": "node scripts/validate.mjs"
+  }
+}
