@@ -161,7 +161,18 @@ pub async fn run(
             continue;
         };
         narration_retries = 0;
-        normalize_action_paths(&root, &mut action)?;
+
+        if let Err(error) = normalize_action_paths(&root, &mut action) {
+            messages.push(json!({"role": "assistant", "content": content}));
+            messages.push(json!({
+                "role": "user",
+                "content": format!(
+                    "HAWK rejected that action before execution because its path was invalid: {error}. Correct the path so it stays inside the active workspace and emit the corrected executable action now. Do not stop."
+                )
+            }));
+            continue;
+        }
+
         let action_name = action["action"].as_str().unwrap_or_default().to_owned();
 
         if action_name == "finish" {
@@ -278,6 +289,7 @@ CRITICAL EXECUTION CONTRACT:
 - If a tool or command fails, inspect the returned error, repair the project, rerun the failed verification, and continue automatically.
 - `finish` is only valid after real execution evidence satisfies the user's requirements.
 - With Full access, do not ask the user for confirmation for ordinary project edits or development commands.
+- With Approve-safe-actions access, HAWK can still run bounded development verification commands such as npm test, npm run lint/build, node workspace scripts, cargo checks, and similar project-local verification.
 
 Supported actions and parameters:
 {{"action":"list_files","query":"optional substring"}}
@@ -326,7 +338,7 @@ async fn execute_action(
             )
         }
         "run_command" => {
-            require_full(permission)?;
+            require_command_permission(permission, action)?;
             run_command(root, action, cancellation).await
         }
         "git_status" => serde_json::to_string_pretty(&project::git_status(
@@ -648,7 +660,7 @@ fn parse_native_tool_call(input: &str) -> Option<Value> {
     let function_end = function_tail.find('>')?;
     let function_name = function_tail[..function_end]
         .trim()
-        .trim_matches(['\'', '"'])
+        .trim_matches(|character: char| matches!(character, '\'' | '"'))
         .trim();
     if function_name.is_empty() {
         return None;
@@ -690,7 +702,7 @@ fn parse_native_parameters(body: &str) -> Map<String, Value> {
         };
         let name = tail[..name_end]
             .trim()
-            .trim_matches(['\'', '"'])
+            .trim_matches(|character: char| matches!(character, '\'' | '"'))
             .trim();
         if name.is_empty() {
             cursor = start + name_end + 1;
@@ -702,10 +714,21 @@ fn parse_native_parameters(body: &str) -> Map<String, Value> {
             break;
         };
         let raw_value = remaining[..value_end_relative].trim();
-        result.insert(name.to_owned(), parse_native_value(raw_value));
+        result.insert(name.to_owned(), parse_native_parameter_value(name, raw_value));
         cursor = value_start + value_end_relative + "</parameter>".len();
     }
     result
+}
+
+fn parse_native_parameter_value(name: &str, raw: &str) -> Value {
+    let trimmed = raw.trim();
+    if matches!(
+        name,
+        "content" | "oldText" | "newText" | "summary" | "path" | "program" | "cwd" | "query" | "url" | "target" | "value"
+    ) {
+        return Value::String(trimmed.to_owned());
+    }
+    parse_native_value(trimmed)
 }
 
 fn parse_native_value(raw: &str) -> Value {
@@ -744,7 +767,7 @@ fn normalize_action_paths(root: &Path, action: &mut Value) -> Result<(), String>
 fn normalize_workspace_relative(root: &Path, raw: &str) -> Result<String, String> {
     let cleaned = raw
         .trim()
-        .trim_matches(['\'', '"', '`'])
+        .trim_matches(|character: char| matches!(character, '\'' | '"' | '`'))
         .trim()
         .to_owned();
     if cleaned.is_empty() {
@@ -763,8 +786,8 @@ fn normalize_workspace_relative(root: &Path, raw: &str) -> Result<String, String
         }
     }
 
-    let root_text = normalize_windows_path_text(&root.to_string_lossy());
-    let candidate_text = normalize_windows_path_text(&cleaned);
+    let root_text = normalize_path_text(&root.to_string_lossy());
+    let candidate_text = normalize_path_text(&cleaned);
     let prefix = format!("{root_text}/");
     if candidate_text == root_text {
         return Ok(".".to_owned());
@@ -777,13 +800,18 @@ fn normalize_workspace_relative(root: &Path, raw: &str) -> Result<String, String
     Err("The model emitted an absolute path outside the active workspace.".to_owned())
 }
 
-fn normalize_windows_path_text(value: &str) -> String {
-    value
+fn normalize_path_text(value: &str) -> String {
+    let normalized = value
         .trim()
         .trim_start_matches("\\\\?\\")
         .replace('\\', "/")
         .trim_end_matches('/')
-        .to_lowercase()
+        .to_owned();
+    if cfg!(windows) {
+        normalized.to_lowercase()
+    } else {
+        normalized
+    }
 }
 
 fn extract_first_json_object(input: &str) -> Option<&str> {
@@ -986,12 +1014,80 @@ fn require_edit(permission: &str) -> Result<(), String> {
     }
 }
 
-fn require_full(permission: &str) -> Result<(), String> {
+fn require_command_permission(permission: &str, action: &Value) -> Result<(), String> {
     if permission == "full" {
-        Ok(())
-    } else {
-        Err("Running arbitrary project commands requires Full access.".to_owned())
+        return Ok(());
     }
+    if permission == "auto" && is_safe_development_command(action) {
+        return Ok(());
+    }
+    Err("This command needs Full access. Safe verification commands can run in Approve-safe-actions mode; arbitrary commands require Full access.".to_owned())
+}
+
+fn is_safe_development_command(action: &Value) -> bool {
+    let program = action["program"]
+        .as_str()
+        .unwrap_or_default()
+        .trim()
+        .to_ascii_lowercase();
+    let args = action["args"]
+        .as_array()
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+    let lower_args = args
+        .iter()
+        .map(|value| value.to_ascii_lowercase())
+        .collect::<Vec<_>>();
+
+    match program.as_str() {
+        "npm" | "pnpm" | "yarn" => {
+            lower_args == ["test"]
+                || matches_safe_run_script(&lower_args)
+                || lower_args == ["lint"]
+                || lower_args == ["build"]
+        }
+        "node" => {
+            !lower_args.iter().any(|value| {
+                matches!(value.as_str(), "-e" | "--eval" | "-p" | "--print" | "-i" | "--interactive")
+            }) && lower_args.iter().all(|value| !looks_absolute_cli_argument(value))
+        }
+        "python" | "python3" | "py" => {
+            !lower_args.iter().any(|value| matches!(value.as_str(), "-c" | "-m"))
+                && lower_args.iter().all(|value| !looks_absolute_cli_argument(value))
+        }
+        "cargo" => lower_args
+            .first()
+            .is_some_and(|value| matches!(value.as_str(), "test" | "check" | "build" | "clippy" | "fmt" | "run")),
+        "git" => lower_args
+            .first()
+            .is_some_and(|value| matches!(value.as_str(), "status" | "diff" | "log" | "show")),
+        _ => false,
+    }
+}
+
+fn matches_safe_run_script(args: &[String]) -> bool {
+    args.len() >= 2
+        && args[0] == "run"
+        && matches!(
+            args[1].as_str(),
+            "test" | "lint" | "build" | "typecheck" | "check" | "verify"
+        )
+}
+
+fn looks_absolute_cli_argument(value: &str) -> bool {
+    let normalized = value.replace('\\', "/");
+    normalized.starts_with('/')
+        || normalized.starts_with("//")
+        || normalized
+            .as_bytes()
+            .get(1)
+            .is_some_and(|byte| *byte == b':')
 }
 
 fn contains_any(text: &str, values: &[&str]) -> bool {
@@ -1051,7 +1147,7 @@ mod tests {
     }
 
     #[test]
-    fn parses_qwen_native_write_file_call() {
+    fn parses_qwen_native_write_file_call_without_converting_content_to_object() {
         let input = r#"<tool_call>
 <function=write_file>
 <parameter=content>
@@ -1068,6 +1164,7 @@ C:\Users\HCES\Desktop\اختبااررر\package.json
         let action = parse_action(input).expect("native tool call should parse");
         assert_eq!(action["action"], "write_file");
         assert_eq!(action["path"], r#"C:\Users\HCES\Desktop\اختبااررر\package.json"#);
+        assert!(action["content"].is_string());
         assert!(action["content"].as_str().unwrap_or_default().contains("hawk-task-engine"));
     }
 
@@ -1096,6 +1193,26 @@ C:\Users\HCES\Desktop\اختبااررر\package.json
     fn rejects_absolute_path_outside_workspace() {
         let root = PathBuf::from(r#"C:\Users\HCES\Desktop\اختبااررر"#);
         assert!(normalize_workspace_relative(&root, r#"C:\Windows\win.ini"#).is_err());
+    }
+
+    #[test]
+    fn auto_permission_allows_project_verification_commands() {
+        assert!(is_safe_development_command(&json!({
+            "program": "npm",
+            "args": ["test"]
+        })));
+        assert!(is_safe_development_command(&json!({
+            "program": "npm",
+            "args": ["run", "build"]
+        })));
+        assert!(is_safe_development_command(&json!({
+            "program": "node",
+            "args": ["src/cli.js", "stats"]
+        })));
+        assert!(!is_safe_development_command(&json!({
+            "program": "node",
+            "args": ["-e", "require('child_process').execSync('whoami')"]
+        })));
     }
 
     #[test]
