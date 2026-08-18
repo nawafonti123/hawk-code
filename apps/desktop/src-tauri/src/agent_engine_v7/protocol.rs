@@ -235,7 +235,9 @@ fn legacy_tool_call_to_json(input: &str) -> Option<Value> {
 
 fn extract_function_name(input: &str) -> Option<String> {
     for marker in ["<function=", "function="] {
-        let position = input.find(marker)?;
+        let Some(position) = input.find(marker) else {
+            continue;
+        };
         let tail = &input[position + marker.len()..];
         let end = tail
             .find(|character: char| {
