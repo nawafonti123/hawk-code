@@ -11,7 +11,8 @@ use runtime::WorkspaceRuntime;
 use serde::Serialize;
 use serde_json::{json, Value};
 use state::{
-    action_to_json, node_verification_action, EventRecorder, Phase, Requirements, RunState,
+    action_to_json, node_verification_action, CheckState, EventRecorder, Phase, Requirements,
+    RunState,
 };
 use tauri::{AppHandle, Emitter};
 use tokio_util::sync::CancellationToken;
@@ -48,7 +49,8 @@ pub async fn run(
         return Err("The agent conversation is empty.".to_owned());
     }
 
-    let workspace = WorkspaceRuntime::new(payload.workspace_path.as_deref(), &payload.permission_profile)?;
+    let workspace =
+        WorkspaceRuntime::new(payload.workspace_path.as_deref(), &payload.permission_profile)?;
     let endpoint = validate_config(&payload.config)?;
     let (api_key, _) = resolve_api_key()?;
     let model_name = payload.config.model.clone();
@@ -71,9 +73,6 @@ pub async fn run(
         None,
     )?;
 
-    // Existing projects get a deterministic baseline verification first. This is
-    // especially important for continuation/repair tasks: it gives the model a
-    // real failing observation instead of asking it to guess what is broken.
     if workspace.root().join("package.json").is_file()
         && run_state.verification.next_check().is_some()
     {
@@ -131,7 +130,11 @@ pub async fn run(
         .await?;
         merge_usage(&mut usage, round_usage);
         run_state.model_rounds = run_state.model_rounds.saturating_add(1);
-        recorder.text(run_state.phase, "model_output", &truncate(&raw_content, 3_000));
+        recorder.text(
+            run_state.phase,
+            "model_output",
+            &truncate(&raw_content, 3_000),
+        );
 
         let action = match workspace.normalize(raw_action) {
             Ok(action) => action,
@@ -139,7 +142,11 @@ pub async fn run(
                 run_state.last_observation = format!(
                     "HAWK rejected that action before execution because its path escaped or did not resolve inside the workspace: {error}. Correct the path and choose the next action."
                 );
-                recorder.text(run_state.phase, "policy_reject", &run_state.last_observation);
+                recorder.text(
+                    run_state.phase,
+                    "policy_reject",
+                    &run_state.last_observation,
+                );
                 continue;
             }
         };
@@ -173,7 +180,11 @@ pub async fn run(
                     }
                     continue;
                 }
-            } else if run_state.guard.seen_inspections.contains(&action.fingerprint()) {
+            } else if run_state
+                .guard
+                .seen_inspections
+                .contains(&action.fingerprint())
+            {
                 duplicate_inspections = duplicate_inspections.saturating_add(1);
                 run_state.last_observation = format!(
                     "HAWK blocked duplicate inspection `{}` because the workspace has not changed. Make progress with an edit or verification command.",
@@ -228,10 +239,16 @@ pub async fn run(
                     run_state.guard.remember_inspection(&action, &output);
                     run_state.phase = Phase::Inspect;
                 } else if action.is_progress() {
+                    let is_edit = matches!(
+                        action,
+                        AgentAction::WriteFile { .. } | AgentAction::ReplaceInFile { .. }
+                    );
+                    let had_failed_check = run_state.verification.last_failed.is_some();
+                    if is_edit {
+                        invalidate_passed_verification(&mut run_state);
+                    }
                     run_state.guard.mark_progress(&action);
-                    if matches!(action, AgentAction::WriteFile { .. } | AgentAction::ReplaceInFile { .. })
-                        && run_state.verification.last_failed.is_some()
-                    {
+                    if is_edit && had_failed_check {
                         run_state.phase = Phase::Verify;
                     } else {
                         run_state.phase = Phase::Act;
@@ -266,7 +283,11 @@ pub async fn run(
                     action.label(),
                     truncate(&error, 20_000)
                 );
-                run_state.push_journal(format!("FAILED — {} — {}", action.label(), truncate(&error, 800)));
+                run_state.push_journal(format!(
+                    "FAILED — {} — {}",
+                    action.label(),
+                    truncate(&error, 800)
+                ));
                 recorder.text(run_state.phase, "error", &run_state.last_observation);
                 emit_activity(
                     app,
@@ -318,7 +339,12 @@ async fn drive_verification(
         format!("Verification: {check}"),
         None,
     )?;
-    recorder.json(state.phase, "verification_action", &action_to_json(&action));
+    recorder.json(
+        state.phase,
+        "verification_action",
+        &action_to_json(&action),
+    );
+    state.evidence.tool_actions = state.evidence.tool_actions.saturating_add(1);
 
     match workspace.execute(&action, cancellation).await {
         Ok(output) => {
@@ -331,7 +357,11 @@ async fn drive_verification(
                 truncate(&output, 12_000)
             );
             state.push_journal(format!("VERIFY PASS — {check}"));
-            recorder.text(state.phase, "verification_pass", &state.last_observation);
+            recorder.text(
+                state.phase,
+                "verification_pass",
+                &state.last_observation,
+            );
             emit_activity(
                 app,
                 request_id,
@@ -359,8 +389,15 @@ async fn drive_verification(
                 "Deterministic verification `{check}` FAILED. This is the exact runtime observation:\n{}\n\nRepair the project. After a real edit, HAWK will automatically retry `{check}`.",
                 truncate(&error, 20_000)
             );
-            state.push_journal(format!("VERIFY FAILED — {check} — {}", truncate(&error, 900)));
-            recorder.text(state.phase, "verification_failed", &state.last_observation);
+            state.push_journal(format!(
+                "VERIFY FAILED — {check} — {}",
+                truncate(&error, 900)
+            ));
+            recorder.text(
+                state.phase,
+                "verification_failed",
+                &state.last_observation,
+            );
             emit_activity(
                 app,
                 request_id,
@@ -372,6 +409,18 @@ async fn drive_verification(
             )?;
             Ok(false)
         }
+    }
+}
+
+fn invalidate_passed_verification(state: &mut RunState) {
+    if state.verification.test == CheckState::Passed {
+        state.verification.test = CheckState::Pending;
+    }
+    if state.verification.lint == CheckState::Passed {
+        state.verification.lint = CheckState::Pending;
+    }
+    if state.verification.build == CheckState::Passed {
+        state.verification.build = CheckState::Pending;
     }
 }
 
