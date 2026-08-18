@@ -16,9 +16,16 @@ from infra.modal import app_base as base
 
 app = modal.App(base.APP_NAME)
 
+# Modal 1.0+ only auto-includes the module/package defining a function. This
+# structured runtime imports sibling project code from infra.modal.app_base, so
+# include the local `infra` package explicitly in the remote image as well. The
+# deploy scripts also launch this file as a Python module, giving us two stable
+# guarantees that the imported HAWK runtime code is available in containers.
+structured_image = base.image.add_local_python_source("infra")
+
 
 @app.cls(
-    image=base.image,
+    image=structured_image,
     gpu=base.GPU_TYPE,
     cpu=base.CPU_CORES,
     memory=base.MEMORY_MB,
@@ -81,6 +88,7 @@ class HAWKModel:
                     "context_window": base.DEFAULT_CONTEXT,
                     "gpu": base.GPU_TYPE,
                     "structured_output": True,
+                    "runtime": "hawk-agent-v7-structured",
                 }
             )
 
