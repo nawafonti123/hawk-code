@@ -4,7 +4,7 @@ mod auth;
 mod autonomous_agent;
 mod autonomous_agent_v2;
 mod autonomous_agent_v3;
-mod autonomous_agent_v4;
+mod autonomous_agent_v5;
 mod browser_automation;
 mod browser_fast_path;
 mod mcp;
