@@ -18,6 +18,7 @@
     "modal:deploy": "pnpm modal:deploy:vision && pnpm modal:deploy:core",
     "modal:deploy:vision": "python -m modal deploy infra/modal/vision.py --env hawk-code",
     "modal:deploy:core": "python -m modal deploy infra/modal/app_base.py --env hawk-code",
+    "modal:prefetch:base": "python -m modal run infra/modal/prefetch_base.py --env hawk-code",
     "modal:serve": "python -m modal serve infra/modal/app_base.py --env hawk-code",
     "modal:logs": "python -m modal app logs hawk-code-ai --env hawk-code",
     "modal:logs:vision": "python -m modal app logs hawk-vision --env hawk-code",
