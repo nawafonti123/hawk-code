@@ -1,1 +1,4 @@
-pub use crate::autonomous_agent_v5::run;
+#[path = "autonomous_agent_v6.rs"]
+mod v6;
+
+pub use v6::run;
