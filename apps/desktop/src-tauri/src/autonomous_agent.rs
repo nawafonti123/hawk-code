@@ -5,7 +5,7 @@ use crate::provider::{
 };
 use crate::{browser_automation, project};
 use serde::Serialize;
-use serde_json::{json, Value};
+use serde_json::{json, Map, Value};
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::process::Output;
@@ -14,11 +14,11 @@ use tokio::process::Command;
 use tokio::time::{timeout, Duration};
 use tokio_util::sync::CancellationToken;
 
-const MAX_STEPS: usize = 96;
-const MAX_FILE_BYTES: u64 = 1_000_000;
+const MAX_STEPS: usize = 128;
+const MAX_FILE_BYTES: u64 = 1_500_000;
 const MAX_WRITE_BYTES: usize = 2_000_000;
-const MAX_TOOL_OUTPUT: usize = 24_000;
-const MAX_NARRATION_RETRIES: usize = 8;
+const MAX_TOOL_OUTPUT: usize = 30_000;
+const MAX_NARRATION_RETRIES: usize = 16;
 
 #[derive(Debug, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -114,7 +114,7 @@ pub async fn run(
                     "model": model,
                     "messages": messages,
                     "stream": false,
-                    "max_tokens": 8192,
+                    "max_tokens": 12_288,
                     "temperature": 0.1
                 }))
                 .send() => result.map_err(|error| format!("Unable to contact HAWK model: {error}"))?,
@@ -132,32 +132,37 @@ pub async fn run(
             .unwrap_or_default()
             .trim()
             .to_owned();
+
         if content.is_empty() {
+            narration_retries += 1;
             messages.push(json!({
                 "role": "user",
-                "content": "Your previous response was empty. Return exactly one executable HAWK action JSON object now."
+                "content": "Your previous response was empty. Emit one executable action now. You may use HAWK JSON or your native <tool_call> format. Do not narrate."
             }));
-            narration_retries += 1;
+            if narration_retries > MAX_NARRATION_RETRIES {
+                return Err("The raw model repeatedly returned empty execution steps.".to_owned());
+            }
             continue;
         }
 
-        let Some(action) = parse_action(&content) else {
+        let Some(mut action) = parse_action(&content) else {
             narration_retries += 1;
             if narration_retries > MAX_NARRATION_RETRIES {
                 return Err(format!(
-                    "The raw model repeatedly narrated instead of executing. Last response: {}",
-                    truncate(&content, 1200)
+                    "The raw model repeatedly returned non-executable output. Last response: {}",
+                    truncate(&content, 1800)
                 ));
             }
             messages.push(json!({"role": "assistant", "content": content}));
             messages.push(json!({
                 "role": "user",
-                "content": "That was narration, not an executable action. Do NOT say what you will do. Return exactly one JSON object using one of: list_files, read_file, write_file, replace_in_file, run_command, git_status, browser_control, finish. No markdown and no prose."
+                "content": "That output was not executable. Do not explain what you will do. Emit exactly one action using either a JSON object with an `action` field OR your native <tool_call><function=...><parameter=...> syntax. Supported actions: list_files, read_file, write_file, replace_in_file, run_command, git_status, browser_control, finish."
             }));
             continue;
         };
         narration_retries = 0;
-        let action_name = action["action"].as_str().unwrap_or_default();
+        normalize_action_paths(&root, &mut action)?;
+        let action_name = action["action"].as_str().unwrap_or_default().to_owned();
 
         if action_name == "finish" {
             if let Some(reason) = completion_blocker(&requirements, &evidence) {
@@ -165,7 +170,7 @@ pub async fn run(
                 messages.push(json!({
                     "role": "user",
                     "content": format!(
-                        "You are not allowed to finish yet: {reason}. Continue executing. Return exactly one tool action JSON object, not prose."
+                        "You are not allowed to finish yet: {reason}. Continue executing immediately. Emit one executable action, not prose."
                     )
                 }));
                 continue;
@@ -208,16 +213,16 @@ pub async fn run(
             app,
             &request_id,
             &activity_id,
-            action_name,
+            &action_name,
             "running",
-            action_detail(action_name, &action),
+            action_detail(&action_name, &action),
             file_path.clone(),
         )?;
 
         let result = execute_action(
             &root,
             &permission,
-            action_name,
+            &action_name,
             &action,
             &cancellation,
         )
@@ -226,7 +231,7 @@ pub async fn run(
         let (state, output) = match result {
             Ok(output) => {
                 evidence.unresolved_failure = false;
-                record_success(&mut evidence, action_name, &action);
+                record_success(&mut evidence, &action_name, &action);
                 ("completed", output)
             }
             Err(error) => {
@@ -238,7 +243,7 @@ pub async fn run(
             app,
             &request_id,
             &activity_id,
-            action_name,
+            &action_name,
             state,
             truncate(output.lines().next().unwrap_or(&output), 260),
             file_path,
@@ -248,14 +253,14 @@ pub async fn run(
         messages.push(json!({
             "role": "user",
             "content": format!(
-                "HAWK TOOL RESULT [{state}] for `{action_name}`:\n{}\n\nContinue autonomously. If this failed, diagnose and repair it. Do not finish until the user's requested work and requested checks have actually succeeded. Return exactly one next-action JSON object.",
+                "HAWK TOOL RESULT [{state}] for `{action_name}`:\n{}\n\nContinue autonomously from this real result. If it failed, diagnose it and repair it. Do not stop or summarize until the requested implementation and requested checks have actually succeeded. Emit exactly one next executable action in JSON or native <tool_call> syntax.",
                 truncate(&output, MAX_TOOL_OUTPUT)
             )
         }));
     }
 
     Err(format!(
-        "HAWK autonomous execution reached the {MAX_STEPS}-step guard before verified completion."
+        "HAWK autonomous execution reached the {MAX_STEPS}-step emergency guard before verified completion."
     ))
 }
 
@@ -265,32 +270,28 @@ fn orchestrator_prompt(root: &Path, permission: &str) -> String {
 Permission profile: {permission}.
 
 CRITICAL EXECUTION CONTRACT:
-- You are not a chat narrator while a task is being executed.
-- Never answer with phrases such as "I will", "سأقوم", "سأبدأ", "دعني أبدأ", or a plan instead of performing work.
-- For every turn, output EXACTLY ONE JSON object and nothing else.
-- Keep working step by step until the requested implementation, tests, fixes, and verification are actually complete.
-- A `finish` action is allowed only after real tool evidence exists. If the user requested tests/lint/build/run, those commands must have succeeded first.
-- If a command or test fails, inspect the error, edit the project, and rerun it. Do not stop at the first failure.
-- With Full access, do not ask for confirmation for normal project file edits or development commands.
+- You are executing real work, not narrating a future plan.
+- Never stop with phrases such as "I will", "سأقوم", "سأبدأ", "دعني أبدأ".
+- Every turn must contain exactly ONE executable action.
+- HAWK accepts either the JSON action format below OR your model-native `<tool_call><function=...><parameter=...>` format. If your native tool syntax is more natural, USE IT. HAWK will parse it.
+- Keep working step by step until implementation, fixes, commands, tests, lint, build, and requested verification are truly complete.
+- If a tool or command fails, inspect the returned error, repair the project, rerun the failed verification, and continue automatically.
+- `finish` is only valid after real execution evidence satisfies the user's requirements.
+- With Full access, do not ask the user for confirmation for ordinary project edits or development commands.
 
-Available JSON actions:
+Supported actions and parameters:
 {{"action":"list_files","query":"optional substring"}}
 {{"action":"read_file","path":"relative/path"}}
 {{"action":"write_file","path":"relative/path","content":"complete file contents"}}
 {{"action":"replace_in_file","path":"relative/path","oldText":"exact unique old text","newText":"replacement"}}
-{{"action":"run_command","program":"node|npm|pnpm|python|cargo|git|other executable","args":["arg1","arg2"],"cwd":"optional/relative/subdir","timeoutSeconds":120}}
+{{"action":"run_command","program":"node|npm|pnpm|python|cargo|git|other executable","args":["arg1","arg2"],"cwd":"optional relative directory","timeoutSeconds":120}}
 {{"action":"git_status"}}
 {{"action":"browser_control","browser":{{"action":"open|goto|snapshot|click|fill|type|press|screenshot|back|forward|reload|close","url":"optional","target":"optional","value":"optional","fullPage":true}}}}
-{{"action":"finish","summary":"concise final result including files changed and checks that passed"}}
+{{"action":"finish","summary":"concise verified final result"}}
 
-Rules:
-- Paths must be workspace-relative.
-- Prefer reading relevant existing files before modifying them.
-- You may create many files, but do one action per turn.
-- `run_command` executes directly without a shell; put each CLI argument in the args array.
-- On Windows, HAWK automatically maps npm/pnpm/npx to their .cmd executables.
-- Do not place JSON in a markdown fence.
-- Do not emit analysis or chain-of-thought.
+Important path rule: prefer workspace-relative paths. If your native tool format emits the absolute workspace path shown above, HAWK will safely convert it to a relative path only when it is inside this workspace.
+`run_command` executes directly without a shell; every CLI argument must be a separate item in `args`. On Windows HAWK maps npm/pnpm/npx/yarn to their .cmd executables automatically.
+Do not emit chain-of-thought. Do not expose internal reasoning. Execute one action at a time.
 "#,
         root = root.display(),
         permission = permission,
@@ -410,7 +411,10 @@ fn list_files(root: &Path, query: Option<&str>) -> Result<String, String> {
             let path = entry.path();
             let name = entry.file_name().to_string_lossy().to_string();
             if path.is_dir() {
-                if matches!(name.as_str(), ".git" | "node_modules" | "target" | ".next" | "dist" | "build") {
+                if matches!(
+                    name.as_str(),
+                    ".git" | "node_modules" | "target" | ".next" | "dist" | "build"
+                ) {
                     continue;
                 }
                 stack.push(path);
@@ -420,13 +424,13 @@ fn list_files(root: &Path, query: Option<&str>) -> Result<String, String> {
                 let text = relative.to_string_lossy().replace('\\', "/");
                 if query.is_empty() || text.to_lowercase().contains(&query) {
                     found.push(text);
-                    if found.len() >= 500 {
+                    if found.len() >= 700 {
                         break;
                     }
                 }
             }
         }
-        if found.len() >= 500 {
+        if found.len() >= 700 {
             break;
         }
     }
@@ -502,12 +506,19 @@ async fn run_command(
         .map(|items| {
             items
                 .iter()
-                .filter_map(Value::as_str)
-                .map(str::to_owned)
+                .map(|item| {
+                    item.as_str()
+                        .map(str::to_owned)
+                        .unwrap_or_else(|| item.to_string())
+                })
                 .collect::<Vec<_>>()
         })
         .unwrap_or_default();
-    let cwd = match action["cwd"].as_str().map(str::trim).filter(|value| !value.is_empty()) {
+    let cwd = match action["cwd"]
+        .as_str()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
         Some(relative) => {
             let path = safe_path(root, relative, false)?;
             if !path.is_dir() {
@@ -519,8 +530,8 @@ async fn run_command(
     };
     let timeout_seconds = action["timeoutSeconds"]
         .as_u64()
-        .unwrap_or(120)
-        .clamp(1, 300);
+        .unwrap_or(180)
+        .clamp(1, 600);
 
     let mut command = Command::new(&program);
     command.args(&args).current_dir(&cwd).kill_on_drop(true);
@@ -575,28 +586,204 @@ fn platform_program(program: &str) -> String {
 
 fn parse_action(content: &str) -> Option<Value> {
     let trimmed = content.trim();
-    if let Ok(value) = serde_json::from_str::<Value>(trimmed) {
-        if value.get("action").and_then(Value::as_str).is_some() {
-            return Some(value);
-        }
+    if let Some(value) = parse_json_action(trimmed) {
+        return Some(value);
     }
+
     let unfenced = trimmed
         .strip_prefix("```json")
         .or_else(|| trimmed.strip_prefix("```"))
         .and_then(|value| value.strip_suffix("```"))
         .map(str::trim);
     if let Some(candidate) = unfenced {
-        if let Ok(value) = serde_json::from_str::<Value>(candidate) {
-            if value.get("action").and_then(Value::as_str).is_some() {
-                return Some(value);
+        if let Some(value) = parse_json_action(candidate) {
+            return Some(value);
+        }
+    }
+
+    if let Some(candidate) = extract_first_json_object(trimmed) {
+        if let Some(value) = parse_json_action(candidate) {
+            return Some(value);
+        }
+    }
+
+    parse_native_tool_call(trimmed)
+}
+
+fn parse_json_action(candidate: &str) -> Option<Value> {
+    let value = serde_json::from_str::<Value>(candidate).ok()?;
+    if value.get("action").and_then(Value::as_str).is_some() {
+        return Some(value);
+    }
+    let name = value.get("name").and_then(Value::as_str)?;
+    let arguments = value.get("arguments").cloned().unwrap_or_else(|| json!({}));
+    let mut result = match arguments {
+        Value::Object(map) => map,
+        Value::String(raw) => serde_json::from_str::<Map<String, Value>>(&raw).ok()?,
+        _ => Map::new(),
+    };
+    result.insert("action".to_owned(), Value::String(name.to_owned()));
+    Some(Value::Object(result))
+}
+
+fn parse_native_tool_call(input: &str) -> Option<Value> {
+    let tool_start = input.find("<tool_call")?;
+    let tool = &input[tool_start..];
+
+    if let Some(open_end) = tool.find('>') {
+        let after_open = &tool[open_end + 1..];
+        if let Some(close) = after_open.find("</tool_call>") {
+            let body = after_open[..close].trim();
+            if body.starts_with('{') {
+                if let Some(value) = parse_json_action(body) {
+                    return Some(value);
+                }
             }
         }
     }
-    extract_first_json_object(trimmed).and_then(|candidate| {
-        serde_json::from_str::<Value>(candidate)
-            .ok()
-            .filter(|value| value.get("action").and_then(Value::as_str).is_some())
-    })
+
+    let function_marker = "<function=";
+    let function_start = tool.find(function_marker)? + function_marker.len();
+    let function_tail = &tool[function_start..];
+    let function_end = function_tail.find('>')?;
+    let function_name = function_tail[..function_end]
+        .trim()
+        .trim_matches(['\'', '"'])
+        .trim();
+    if function_name.is_empty() {
+        return None;
+    }
+
+    let function_body = &function_tail[function_end + 1..];
+    let body_end = function_body.find("</function>").unwrap_or(function_body.len());
+    let body = &function_body[..body_end];
+    let parameters = parse_native_parameters(body);
+
+    if function_name == "browser_control" {
+        let mut browser = Map::new();
+        for (key, value) in parameters {
+            browser.insert(key, value);
+        }
+        return Some(json!({"action": "browser_control", "browser": Value::Object(browser)}));
+    }
+
+    let mut action = Map::new();
+    action.insert(
+        "action".to_owned(),
+        Value::String(function_name.to_owned()),
+    );
+    for (key, value) in parameters {
+        action.insert(key, value);
+    }
+    Some(Value::Object(action))
+}
+
+fn parse_native_parameters(body: &str) -> Map<String, Value> {
+    let mut result = Map::new();
+    let marker = "<parameter=";
+    let mut cursor = 0usize;
+    while let Some(relative_start) = body[cursor..].find(marker) {
+        let start = cursor + relative_start + marker.len();
+        let tail = &body[start..];
+        let Some(name_end) = tail.find('>') else {
+            break;
+        };
+        let name = tail[..name_end]
+            .trim()
+            .trim_matches(['\'', '"'])
+            .trim();
+        if name.is_empty() {
+            cursor = start + name_end + 1;
+            continue;
+        }
+        let value_start = start + name_end + 1;
+        let remaining = &body[value_start..];
+        let Some(value_end_relative) = remaining.find("</parameter>") else {
+            break;
+        };
+        let raw_value = remaining[..value_end_relative].trim();
+        result.insert(name.to_owned(), parse_native_value(raw_value));
+        cursor = value_start + value_end_relative + "</parameter>".len();
+    }
+    result
+}
+
+fn parse_native_value(raw: &str) -> Value {
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return Value::String(String::new());
+    }
+    if let Ok(value) = serde_json::from_str::<Value>(trimmed) {
+        return value;
+    }
+    if trimmed.eq_ignore_ascii_case("true") {
+        return Value::Bool(true);
+    }
+    if trimmed.eq_ignore_ascii_case("false") {
+        return Value::Bool(false);
+    }
+    if let Ok(value) = trimmed.parse::<u64>() {
+        return Value::Number(value.into());
+    }
+    Value::String(trimmed.to_owned())
+}
+
+fn normalize_action_paths(root: &Path, action: &mut Value) -> Result<(), String> {
+    for key in ["path", "cwd"] {
+        let Some(raw) = action.get(key).and_then(Value::as_str).map(str::to_owned) else {
+            continue;
+        };
+        let normalized = normalize_workspace_relative(root, &raw)?;
+        if let Some(object) = action.as_object_mut() {
+            object.insert(key.to_owned(), Value::String(normalized));
+        }
+    }
+    Ok(())
+}
+
+fn normalize_workspace_relative(root: &Path, raw: &str) -> Result<String, String> {
+    let cleaned = raw
+        .trim()
+        .trim_matches(['\'', '"', '`'])
+        .trim()
+        .to_owned();
+    if cleaned.is_empty() {
+        return Err("Path is empty.".to_owned());
+    }
+    let candidate = PathBuf::from(&cleaned);
+    if !candidate.is_absolute() {
+        return Ok(cleaned.replace('\\', "/"));
+    }
+
+    if candidate.exists() {
+        if let Ok(canonical) = candidate.canonicalize() {
+            if let Ok(relative) = canonical.strip_prefix(root) {
+                return Ok(relative.to_string_lossy().replace('\\', "/"));
+            }
+        }
+    }
+
+    let root_text = normalize_windows_path_text(&root.to_string_lossy());
+    let candidate_text = normalize_windows_path_text(&cleaned);
+    let prefix = format!("{root_text}/");
+    if candidate_text == root_text {
+        return Ok(".".to_owned());
+    }
+    if let Some(relative) = candidate_text.strip_prefix(&prefix) {
+        if !relative.is_empty() {
+            return Ok(relative.to_owned());
+        }
+    }
+    Err("The model emitted an absolute path outside the active workspace.".to_owned())
+}
+
+fn normalize_windows_path_text(value: &str) -> String {
+    value
+        .trim()
+        .trim_start_matches("\\\\?\\")
+        .replace('\\', "/")
+        .trim_end_matches('/')
+        .to_lowercase()
 }
 
 fn extract_first_json_object(input: &str) -> Option<&str> {
@@ -635,12 +822,28 @@ fn extract_first_json_object(input: &str) -> Option<&str> {
 fn infer_requirements(text: &str) -> Requirements {
     let lower = text.to_lowercase();
     Requirements {
-        execution: contains_any(&lower, &["أنش", "انش", "ابن", "بناء", "نفذ", "نفّذ", "طبق", "طبّق", "اصلح", "أصلح", "عدّل", "عدل", "اكتب", "شغل", "شغّل", "اختبر", "create", "build", "implement", "fix", "modify", "write", "run", "test"]),
-        writes: contains_any(&lower, &["أنش", "انش", "ابن", "بناء", "طبق", "طبّق", "اصلح", "أصلح", "عدّل", "عدل", "اكتب", "create", "build", "implement", "fix", "modify", "write"]),
+        execution: contains_any(
+            &lower,
+            &[
+                "أنش", "انش", "ابن", "بناء", "نفذ", "نفّذ", "طبق", "طبّق", "اصلح",
+                "أصلح", "عدّل", "عدل", "اكتب", "شغل", "شغّل", "اختبر", "create", "build",
+                "implement", "fix", "modify", "write", "run", "test",
+            ],
+        ),
+        writes: contains_any(
+            &lower,
+            &[
+                "أنش", "انش", "ابن", "بناء", "طبق", "طبّق", "اصلح", "أصلح", "عدّل",
+                "عدل", "اكتب", "create", "build", "implement", "fix", "modify", "write",
+            ],
+        ),
         run: contains_any(&lower, &["شغل", "شغّل", "تشغيل", "نفذ", "نفّذ", "run", "execute"]),
         test: contains_any(&lower, &["اختبار", "اختبارات", "اختبر", "test", "tests", "npm test"]),
-        lint: contains_any(&lower, &["lint", "تنسيق", "فحص lint"]),
-        build: contains_any(&lower, &["npm run build", "pnpm build", "cargo build", " build", "بناء المشروع", "البناء"]),
+        lint: contains_any(&lower, &["lint", "فحص lint"]),
+        build: contains_any(
+            &lower,
+            &["npm run build", "pnpm build", "cargo build", " build", "بناء المشروع", "البناء"],
+        ),
     }
 }
 
@@ -684,7 +887,13 @@ fn record_success(evidence: &mut Evidence, name: &str, action: &Value) {
             let program = action["program"].as_str().unwrap_or_default();
             let args = action["args"]
                 .as_array()
-                .map(|items| items.iter().filter_map(Value::as_str).collect::<Vec<_>>().join(" "))
+                .map(|items| {
+                    items
+                        .iter()
+                        .map(|value| value.as_str().map(str::to_owned).unwrap_or_else(|| value.to_string()))
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                })
                 .unwrap_or_default();
             evidence
                 .successful_commands
@@ -705,7 +914,13 @@ fn action_detail(name: &str, action: &Value) -> String {
             action["program"].as_str().unwrap_or("command"),
             action["args"]
                 .as_array()
-                .map(|items| items.iter().filter_map(Value::as_str).collect::<Vec<_>>().join(" "))
+                .map(|items| {
+                    items
+                        .iter()
+                        .map(|value| value.as_str().map(str::to_owned).unwrap_or_else(|| value.to_string()))
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                })
                 .unwrap_or_default()
         ),
         "git_status" => "Inspecting Git status".to_owned(),
@@ -744,14 +959,14 @@ fn content_text(content: &Value) -> String {
 }
 
 fn compact_messages(messages: &mut Vec<Value>) {
-    const KEEP: usize = 36;
+    const KEEP: usize = 44;
     if messages.len() <= KEEP + 3 {
         return;
     }
     let mut compacted = messages.iter().take(3).cloned().collect::<Vec<_>>();
     compacted.push(json!({
         "role": "system",
-        "content": "Earlier execution history was compacted by HAWK. Continue from the recent tool evidence below; do not redo completed work unless verification requires it."
+        "content": "Earlier execution history was compacted by HAWK. Continue from the recent real tool evidence below. Do not redo completed work unless verification requires it."
     }));
     compacted.extend(messages.iter().skip(messages.len() - KEEP).cloned());
     *messages = compacted;
@@ -760,14 +975,14 @@ fn compact_messages(messages: &mut Vec<Value>) {
 fn required_string<'a>(value: &'a Value, key: &str) -> Result<&'a str, String> {
     value[key]
         .as_str()
-        .ok_or_else(|| format!("Missing required string field: {key}"))
+        .ok_or_else(|| format!("Missing required string parameter: {key}"))
 }
 
 fn require_edit(permission: &str) -> Result<(), String> {
     if matches!(permission, "auto" | "full") {
         Ok(())
     } else {
-        Err("This action needs edit permission.".to_owned())
+        Err("This action requires edit permission.".to_owned())
     }
 }
 
@@ -775,29 +990,12 @@ fn require_full(permission: &str) -> Result<(), String> {
     if permission == "full" {
         Ok(())
     } else {
-        Err("Running project commands requires Full access.".to_owned())
+        Err("Running arbitrary project commands requires Full access.".to_owned())
     }
 }
 
-fn contains_any(text: &str, needles: &[&str]) -> bool {
-    needles.iter().any(|needle| text.contains(needle))
-}
-
-fn merge_usage(total: &mut UsageSummary, next: UsageSummary) {
-    total.prompt_tokens += next.prompt_tokens;
-    total.completion_tokens += next.completion_tokens;
-    total.total_tokens += next.total_tokens;
-}
-
-fn truncate(value: &str, max_chars: usize) -> String {
-    if value.chars().count() <= max_chars {
-        value.to_owned()
-    } else {
-        format!(
-            "{}\n... truncated by HAWK Code ...",
-            value.chars().take(max_chars).collect::<String>()
-        )
-    }
+fn contains_any(text: &str, values: &[&str]) -> bool {
+    values.iter().any(|value| text.contains(value))
 }
 
 fn emit_activity(
@@ -823,30 +1021,96 @@ fn emit_activity(
     .map_err(|_| "Unable to deliver agent activity to the interface.".to_owned())
 }
 
+fn merge_usage(total: &mut UsageSummary, next: UsageSummary) {
+    total.prompt_tokens += next.prompt_tokens;
+    total.completion_tokens += next.completion_tokens;
+    total.total_tokens += next.total_tokens;
+}
+
+fn truncate(value: &str, max_chars: usize) -> String {
+    if value.chars().count() <= max_chars {
+        value.to_owned()
+    } else {
+        format!(
+            "{}\n... truncated by HAWK Code ...",
+            value.chars().take(max_chars).collect::<String>()
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn extracts_action_from_narrated_json() {
-        let parsed = parse_action("next: {\"action\":\"read_file\",\"path\":\"src/a.js\"} done")
-            .expect("action should parse");
-        assert_eq!(parsed["action"], "read_file");
+    fn parses_plain_json_action() {
+        let action = parse_action(r#"{"action":"write_file","path":"package.json","content":"{}"}"#)
+            .expect("JSON action should parse");
+        assert_eq!(action["action"], "write_file");
+        assert_eq!(action["path"], "package.json");
     }
 
     #[test]
-    fn blocks_premature_finish_for_execution_task() {
-        let requirements = infer_requirements("ابن المشروع وشغل الاختبارات");
-        let evidence = Evidence::default();
-        assert!(completion_blocker(&requirements, &evidence).is_some());
+    fn parses_qwen_native_write_file_call() {
+        let input = r#"<tool_call>
+<function=write_file>
+<parameter=content>
+{
+  "name": "hawk-task-engine",
+  "version": "1.0.0"
+}
+</parameter>
+<parameter=path>
+C:\Users\HCES\Desktop\اختبااررر\package.json
+</parameter>
+</function>
+</tool_call>"#;
+        let action = parse_action(input).expect("native tool call should parse");
+        assert_eq!(action["action"], "write_file");
+        assert_eq!(action["path"], r#"C:\Users\HCES\Desktop\اختبااررر\package.json"#);
+        assert!(action["content"].as_str().unwrap_or_default().contains("hawk-task-engine"));
     }
 
     #[test]
-    fn accepts_verified_test_build_flow() {
-        let requirements = infer_requirements("build app, run tests and lint and npm run build");
+    fn parses_native_run_command_arguments_as_json() {
+        let input = r#"<tool_call><function=run_command><parameter=program>npm</parameter><parameter=args>["test"]</parameter><parameter=timeoutSeconds>240</parameter></function></tool_call>"#;
+        let action = parse_action(input).expect("native command should parse");
+        assert_eq!(action["action"], "run_command");
+        assert_eq!(action["program"], "npm");
+        assert_eq!(action["args"][0], "test");
+        assert_eq!(action["timeoutSeconds"], 240);
+    }
+
+    #[test]
+    fn converts_absolute_windows_workspace_path_to_relative() {
+        let root = PathBuf::from(r#"C:\Users\HCES\Desktop\اختبااررر"#);
+        let relative = normalize_workspace_relative(
+            &root,
+            r#"C:\Users\HCES\Desktop\اختبااررر\package.json"#,
+        )
+        .expect("path should stay in workspace");
+        assert_eq!(relative, "package.json");
+    }
+
+    #[test]
+    fn rejects_absolute_path_outside_workspace() {
+        let root = PathBuf::from(r#"C:\Users\HCES\Desktop\اختبااررر"#);
+        assert!(normalize_workspace_relative(&root, r#"C:\Windows\win.ini"#).is_err());
+    }
+
+    #[test]
+    fn completion_requires_requested_checks() {
+        let requirements = Requirements {
+            execution: true,
+            writes: true,
+            run: true,
+            test: true,
+            lint: true,
+            build: true,
+        };
         let evidence = Evidence {
-            tool_calls: 8,
-            writes: 4,
+            tool_calls: 12,
+            writes: 8,
             commands: 3,
             successful_commands: vec![
                 "npm test".to_owned(),
