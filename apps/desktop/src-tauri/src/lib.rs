@@ -1,6 +1,7 @@
 mod agent;
 mod attachments;
 mod auth;
+mod autonomous_agent;
 mod browser_automation;
 mod browser_fast_path;
 mod mcp;
@@ -180,7 +181,7 @@ async fn qwen_agent(
     {
         browser_fast_path::FastPathOutcome::Handled(result) => Ok(result),
         browser_fast_path::FastPathOutcome::Continue(payload) => {
-            agent::run(&app, &runtime, payload, cancellation).await
+            autonomous_agent::run(&app, &runtime, payload, cancellation).await
         }
     }
 }
