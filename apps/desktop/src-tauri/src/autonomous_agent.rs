@@ -19,6 +19,16 @@ const MAX_FILE_BYTES: u64 = 1_500_000;
 const MAX_WRITE_BYTES: usize = 2_000_000;
 const MAX_TOOL_OUTPUT: usize = 30_000;
 const MAX_NARRATION_RETRIES: usize = 16;
+const SUPPORTED_ACTIONS: [&str; 8] = [
+    "list_files",
+    "read_file",
+    "write_file",
+    "replace_in_file",
+    "run_command",
+    "git_status",
+    "browser_control",
+    "finish",
+];
 
 #[derive(Debug, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -156,7 +166,7 @@ pub async fn run(
             messages.push(json!({"role": "assistant", "content": content}));
             messages.push(json!({
                 "role": "user",
-                "content": "That output was not executable. Do not explain what you will do. Emit exactly one action using either a JSON object with an `action` field OR your native <tool_call><function=...><parameter=...> syntax. Supported actions: list_files, read_file, write_file, replace_in_file, run_command, git_status, browser_control, finish."
+                "content": "That output was not executable. Do not explain what you will do. Emit exactly one supported action using either a JSON object with an `action` field OR your native <tool_call><function=...><parameter=...> syntax. Supported actions: list_files, read_file, write_file, replace_in_file, run_command, git_status, browser_control, finish."
             }));
             continue;
         };
@@ -375,6 +385,9 @@ fn workspace_root(path: Option<&str>) -> Result<PathBuf, String> {
 
 fn safe_path(root: &Path, relative: &str, allow_missing: bool) -> Result<PathBuf, String> {
     let relative = relative.trim().replace('\\', "/");
+    if relative == "." {
+        return Ok(root.to_path_buf());
+    }
     let candidate = Path::new(&relative);
     if relative.is_empty()
         || candidate.is_absolute()
@@ -613,26 +626,34 @@ fn parse_action(content: &str) -> Option<Value> {
         }
     }
 
-    if let Some(candidate) = extract_first_json_object(trimmed) {
-        if let Some(value) = parse_json_action(candidate) {
-            return Some(value);
-        }
+    // Qwen3-Coder-Next-Base naturally emits its learned native XML-like tool
+    // protocol. Parse it before scanning for embedded JSON because a write_file
+    // payload such as package.json can itself contain a top-level `name` field.
+    if let Some(value) = parse_native_tool_call(trimmed) {
+        return Some(value);
     }
 
-    parse_native_tool_call(trimmed)
+    extract_first_json_object(trimmed).and_then(parse_json_action)
 }
 
 fn parse_json_action(candidate: &str) -> Option<Value> {
     let value = serde_json::from_str::<Value>(candidate).ok()?;
-    if value.get("action").and_then(Value::as_str).is_some() {
-        return Some(value);
+    if let Some(name) = value.get("action").and_then(Value::as_str) {
+        return is_supported_action(name).then_some(value);
     }
+
+    // OpenAI-like text fallback: {"name":"write_file","arguments":{...}}
+    // Only recognize it when `arguments` is actually present. This prevents a
+    // package.json payload's ordinary `name` field from being mistaken for a tool.
     let name = value.get("name").and_then(Value::as_str)?;
+    if !is_supported_action(name) || value.get("arguments").is_none() {
+        return None;
+    }
     let arguments = value.get("arguments").cloned().unwrap_or_else(|| json!({}));
     let mut result = match arguments {
         Value::Object(map) => map,
         Value::String(raw) => serde_json::from_str::<Map<String, Value>>(&raw).ok()?,
-        _ => Map::new(),
+        _ => return None,
     };
     result.insert("action".to_owned(), Value::String(name.to_owned()));
     Some(Value::Object(result))
@@ -662,7 +683,7 @@ fn parse_native_tool_call(input: &str) -> Option<Value> {
         .trim()
         .trim_matches(|character: char| matches!(character, '\'' | '"'))
         .trim();
-    if function_name.is_empty() {
+    if !is_supported_action(function_name) {
         return None;
     }
 
@@ -749,6 +770,10 @@ fn parse_native_value(raw: &str) -> Value {
         return Value::Number(value.into());
     }
     Value::String(trimmed.to_owned())
+}
+
+fn is_supported_action(name: &str) -> bool {
+    SUPPORTED_ACTIONS.contains(&name)
 }
 
 fn normalize_action_paths(root: &Path, action: &mut Value) -> Result<(), String> {
@@ -1036,35 +1061,29 @@ fn is_safe_development_command(action: &Value) -> bool {
             items
                 .iter()
                 .filter_map(Value::as_str)
-                .map(str::to_owned)
+                .map(|value| value.to_ascii_lowercase())
                 .collect::<Vec<_>>()
         })
         .unwrap_or_default();
-    let lower_args = args
-        .iter()
-        .map(|value| value.to_ascii_lowercase())
-        .collect::<Vec<_>>();
 
     match program.as_str() {
         "npm" | "pnpm" | "yarn" => {
-            lower_args == ["test"]
-                || matches_safe_run_script(&lower_args)
-                || lower_args == ["lint"]
-                || lower_args == ["build"]
+            (args.len() == 1 && matches!(args[0].as_str(), "test" | "lint" | "build"))
+                || matches_safe_run_script(&args)
         }
         "node" => {
-            !lower_args.iter().any(|value| {
+            !args.iter().any(|value| {
                 matches!(value.as_str(), "-e" | "--eval" | "-p" | "--print" | "-i" | "--interactive")
-            }) && lower_args.iter().all(|value| !looks_absolute_cli_argument(value))
+            }) && args.iter().all(|value| !looks_absolute_cli_argument(value))
         }
         "python" | "python3" | "py" => {
-            !lower_args.iter().any(|value| matches!(value.as_str(), "-c" | "-m"))
-                && lower_args.iter().all(|value| !looks_absolute_cli_argument(value))
+            !args.iter().any(|value| matches!(value.as_str(), "-c" | "-m"))
+                && args.iter().all(|value| !looks_absolute_cli_argument(value))
         }
-        "cargo" => lower_args
+        "cargo" => args
             .first()
             .is_some_and(|value| matches!(value.as_str(), "test" | "check" | "build" | "clippy" | "fmt" | "run")),
-        "git" => lower_args
+        "git" => args
             .first()
             .is_some_and(|value| matches!(value.as_str(), "status" | "diff" | "log" | "show")),
         _ => false,
@@ -1147,7 +1166,7 @@ mod tests {
     }
 
     #[test]
-    fn parses_qwen_native_write_file_call_without_converting_content_to_object() {
+    fn parses_qwen_native_write_file_call_without_misreading_package_json() {
         let input = r#"<tool_call>
 <function=write_file>
 <parameter=content>
@@ -1166,6 +1185,11 @@ C:\Users\HCES\Desktop\اختبااررر\package.json
         assert_eq!(action["path"], r#"C:\Users\HCES\Desktop\اختبااررر\package.json"#);
         assert!(action["content"].is_string());
         assert!(action["content"].as_str().unwrap_or_default().contains("hawk-task-engine"));
+    }
+
+    #[test]
+    fn package_json_is_not_treated_as_openai_tool_call() {
+        assert!(parse_json_action(r#"{"name":"hawk-task-engine","version":"1.0.0"}"#).is_none());
     }
 
     #[test]
