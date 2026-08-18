@@ -44,7 +44,7 @@ struct Evidence {
     writes: usize,
     commands: usize,
     successful_commands: Vec<String>,
-    failures: usize,
+    unresolved_failure: bool,
 }
 
 #[derive(Default)]
@@ -225,11 +225,12 @@ pub async fn run(
         evidence.tool_calls += 1;
         let (state, output) = match result {
             Ok(output) => {
+                evidence.unresolved_failure = false;
                 record_success(&mut evidence, action_name, &action);
                 ("completed", output)
             }
             Err(error) => {
-                evidence.failures += 1;
+                evidence.unresolved_failure = true;
                 ("failed", format!("Tool error: {error}"))
             }
         };
@@ -492,7 +493,7 @@ async fn run_command(
     cancellation: &CancellationToken,
 ) -> Result<String, String> {
     let raw_program = required_string(action, "program")?.trim();
-    if raw_program.is_empty() || raw_program.contains(['/', '\\']) {
+    if raw_program.is_empty() || raw_program.contains('/') || raw_program.contains('\\') {
         return Err("program must be an executable name available on PATH.".to_owned());
     }
     let program = platform_program(raw_program);
@@ -644,6 +645,9 @@ fn infer_requirements(text: &str) -> Requirements {
 }
 
 fn completion_blocker(requirements: &Requirements, evidence: &Evidence) -> Option<String> {
+    if evidence.unresolved_failure {
+        return Some("the most recent tool action failed and has not been repaired yet".to_owned());
+    }
     if requirements.execution && evidence.tool_calls == 0 {
         return Some("no real tool action has been executed".to_owned());
     }
@@ -849,7 +853,7 @@ mod tests {
                 "npm run lint".to_owned(),
                 "npm run build".to_owned(),
             ],
-            failures: 0,
+            unresolved_failure: false,
         };
         assert!(completion_blocker(&requirements, &evidence).is_none());
     }
